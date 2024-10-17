@@ -1,14 +1,14 @@
 import { Button, useToast } from "@chakra-ui/react";
 import { Form, Formik, FormikProps } from "formik";
 import CustomInput from "./CustomInput";
-import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import {
-  browserLocalPersistence,
+  browserSessionPersistence,
   setPersistence,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../firebase";
+import { loginFormvalidationSchema } from "../validationSchema/loginFormValidationSchema";
 
 interface LoginFormValues {
   email: string;
@@ -24,18 +24,9 @@ const LoginForm = () => {
     password: "",
   };
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Devi inserire un indirizzo email valido")
-      .required("L'email è obbligatoria"),
-    password: Yup.string()
-      .min(8, "La password deve contenere almeno 8 caratteri")
-      .required("La password è obbligatoria"),
-  });
-
-  const handleLogin = (token: LoginFormValues) => {
-    const { email, password } = token;
-    setPersistence(auth, browserLocalPersistence)
+  const handleLogin = (loginValues: LoginFormValues) => {
+    const { email, password } = loginValues;
+    setPersistence(auth, browserSessionPersistence)
       .then(() => {
         return signInWithEmailAndPassword(auth, email, password);
       })
@@ -58,7 +49,7 @@ const LoginForm = () => {
       <h2 className="text-center pb-5 font-bold text-2xl">Effettua la Login</h2>
       <Formik
         initialValues={initialLoginValues}
-        validationSchema={validationSchema}
+        validationSchema={loginFormvalidationSchema}
         onSubmit={(valuesForm) => handleLogin(valuesForm)}
       >
         {(props: FormikProps<LoginFormValues>) => (
