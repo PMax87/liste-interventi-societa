@@ -8,6 +8,7 @@ import {
   NumberInputField,
   Select,
   useToast,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase";
@@ -20,7 +21,7 @@ interface AssistanceInputForm {
   data_intervento: string;
   numero_dossier: string;
   esito_intervento: boolean;
-  importo_intervento: number;
+  importo_intervento: string;
   nome_compagnia: string;
 }
 
@@ -35,7 +36,7 @@ const AssistanceInputForm = () => {
     data_intervento: "",
     numero_dossier: "",
     esito_intervento: false,
-    importo_intervento: 0,
+    importo_intervento: "",
     nome_compagnia: "",
   };
 
@@ -75,7 +76,7 @@ const AssistanceInputForm = () => {
       resetForm({
         values: {
           targa: "",
-          importo_intervento: 0,
+          importo_intervento: "",
           data_intervento: "",
           numero_dossier: "",
           nome_compagnia: "",
@@ -128,21 +129,17 @@ const AssistanceInputForm = () => {
               />
             </div>
             <div className="grid grid-cols-3 gap-5 content-center mt-3">
-              <FormControl>
-                <FormLabel htmlFor="importo" fontWeight="bold">
-                  Importo
-                </FormLabel>
-                <NumberInput
-                  name="importo_intervento"
-                  value={props.values.importo_intervento || ""}
-                >
-                  <NumberInputField
-                    onChange={props.handleChange}
-                    placeholder="Inserisci l'importo"
-                  />
-                </NumberInput>
-              </FormControl>
-              <FormControl>
+              <CustomInput
+                placeholder="Inserisci importo intervento"
+                formLabel="Importo Intervento"
+                type="text"
+                name="importo_intervento"
+              />
+              <FormControl
+                isInvalid={Boolean(
+                  props.errors.nome_compagnia && props.touched.nome_compagnia
+                )}
+              >
                 <FormLabel htmlFor="accettato" fontWeight="bold">
                   Lista società
                 </FormLabel>
@@ -165,6 +162,9 @@ const AssistanceInputForm = () => {
                       );
                     })}
                 </Select>
+                <FormErrorMessage>
+                  {props.errors.nome_compagnia}
+                </FormErrorMessage>
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="accettato" fontWeight="bold">

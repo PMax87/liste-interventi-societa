@@ -18,7 +18,8 @@ export const assistanceInputValidationSchema = Yup.object().shape({
 
   importo_intervento: Yup.string()
     .required("L'importo dell'intervento è obbligatorio")
-    .min(0, "L'importo non può essere negativo"),
+    .min(0, "L'importo non può essere negativo")
+    .matches(/^\d+$/, "Il numero dossier deve essere composto solo da cifre"),
 
   nome_compagnia: Yup.string().required(
     "La compagnia assicurativa è obbligatoria"

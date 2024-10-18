@@ -12,9 +12,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   buttonText,
   buttonColor,
   type,
+  isDisabled,
 }) => {
   return (
-    <Button type={type} colorScheme={buttonColor}>
+    <Button type={type} colorScheme={buttonColor} isDisabled={isDisabled}>
       {buttonText}
     </Button>
   );
