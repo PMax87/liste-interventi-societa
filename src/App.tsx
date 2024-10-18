@@ -5,20 +5,20 @@ import { useEffect } from "react";
 import { auth } from "./firebase";
 import { useAuth } from "./context/AuthContext";
 import { Center, Spinner } from "@chakra-ui/react";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   const {
-    setIsAuthenticated,
     isAuthenticated,
-    setAuthUser,
     isLoadingAuth,
+    setAuthUser,
+    setIsAuthenticated,
     setIsLoadingAuth,
   } = useAuth();
 
   useEffect(() => {
     auth.onAuthStateChanged((authUser) => {
       if (authUser) {
-        console.log(authUser);
         setAuthUser({
           userEmail: authUser.email,
           userName: authUser.displayName,
@@ -45,6 +45,7 @@ function App() {
             path="/home"
             element={
               <PrivateRoute isAuthenticated={isAuthenticated}>
+                <Sidebar />
                 <HomePage />
               </PrivateRoute>
             }

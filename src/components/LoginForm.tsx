@@ -54,11 +54,17 @@ const LoginForm = () => {
       >
         {(props: FormikProps<LoginFormValues>) => (
           <Form className="flex flex-col gap-5">
-            <CustomInput type="email" name="email" placeholder="La tua mail" />
+            <CustomInput
+              type="email"
+              name="email"
+              placeholder="Email"
+              formLabel="La tua e-mail"
+            />
             <CustomInput
               type="password"
               name="password"
               placeholder="La tua password"
+              formLabel="Password"
             />
             <Button colorScheme="blue" type="submit" disabled={!props.isValid}>
               Invia

@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import AssistancesList from "../components/AssistancesList";
+import { AssistanceInputForm } from "../components";
 
 const HomePage = () => {
   const { authUser } = useAuth();
@@ -14,10 +16,9 @@ const HomePage = () => {
   };
 
   return (
-    <div>
-      <p>{authUser?.userEmail}</p>
-      <p>{authUser?.userName}</p>
-      <Button onClick={handleLogout}>Esci</Button>
+    <div className="p-8 sm:ml-64">
+      <AssistanceInputForm />
+      <AssistancesList />
     </div>
   );
 };
