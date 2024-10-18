@@ -31,15 +31,27 @@ const AssistancesList = () => {
       </div>
       <Divider className="py-1" />
       {assistancesList &&
-        assistancesList.map((assistance: AssistancesList) => {
+        assistancesList.map((assistance: AssistancesList, index: number) => {
           return (
-            <div className="grid grid-cols-7 items-center">
-              <h2>{assistance.data_intervento}</h2>
-              <h2>{assistance.nome_compagnia}</h2>
-              <h2>{assistance.targa}</h2>
-              <h2>{assistance.numero_dossier}</h2>
-              <h2>{assistance.esito_intervento === true ? "Sì" : "No"}</h2>
-              <h2>{assistance.importo_intervento}</h2>
+            <div
+              className={`grid grid-cols-7 content-center py-2 ${
+                index % 2 === 0 ? "bg-slate-200" : "bg-white"
+              }`}
+            >
+              <h2 className="text-center">{assistance.data_intervento}</h2>
+              <h2 className="text-center capitalize">
+                {assistance.nome_compagnia}
+              </h2>
+              <h2 className="text-center">{assistance.targa}</h2>
+              <h2 className="text-center">{assistance.numero_dossier}</h2>
+              <h2 className="text-center">
+                {assistance.esito_intervento === true ? "Sì" : "No"}
+              </h2>
+              <h2 className="text-center">{assistance.importo_intervento}</h2>
+              <div className="flex justify-center gap-4">
+                <p>Modifica</p>
+                <p>Elimina</p>
+              </div>
             </div>
           );
         })}

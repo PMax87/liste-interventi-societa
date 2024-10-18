@@ -13,6 +13,8 @@ import { useCompanies } from "../context/CompanyContext";
 import assistanceInputValidationSchema from "../validationSchema/assistanceFormValidationSchema";
 import { CustomButton } from ".";
 import { useCustomToast } from "../useCustomToast";
+import { useEffect } from "react";
+import { useAssistances } from "../context/ServicesContext";
 
 interface AssistanceInputForm {
   targa: string;
@@ -38,8 +40,13 @@ const AssistanceInputForm = () => {
     nome_compagnia: "",
   };
 
-  const { companiesList } = useCompanies();
+  const { companiesList, getCompaniesList } = useCompanies();
+  const { getAssistancesList } = useAssistances();
   const showToast = useCustomToast();
+
+  useEffect(() => {
+    getCompaniesList();
+  }, []);
 
   const onHandleSubmit = async ({ values, resetForm }: HandleSubmitParams) => {
     const {
@@ -51,7 +58,8 @@ const AssistanceInputForm = () => {
       nome_compagnia,
     } = values;
 
-    const importoNumber = parseFloat(importo_intervento.toString());
+    const formattedImport = importo_intervento.replace(",", ".");
+    const importoNumber = parseFloat(formattedImport.toString());
 
     try {
       await addDoc(collection(db, "lista_interventi"), {
@@ -79,6 +87,7 @@ const AssistanceInputForm = () => {
           esito_intervento: false,
         },
       });
+      getAssistancesList();
     } catch (error) {
       showToast({
         description: "Non è stato possibile salvare i dati, riprova.",
