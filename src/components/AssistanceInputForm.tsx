@@ -4,10 +4,7 @@ import {
   Checkbox,
   FormControl,
   FormLabel,
-  NumberInput,
-  NumberInputField,
   Select,
-  useToast,
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { addDoc, collection } from "firebase/firestore";
@@ -15,6 +12,7 @@ import { db } from "../firebase";
 import { useCompanies } from "../context/CompanyContext";
 import assistanceInputValidationSchema from "../validationSchema/assistanceFormValidationSchema";
 import { CustomButton } from ".";
+import { useCustomToast } from "../useCustomToast";
 
 interface AssistanceInputForm {
   targa: string;
@@ -41,7 +39,7 @@ const AssistanceInputForm = () => {
   };
 
   const { companiesList } = useCompanies();
-  const toast = useToast();
+  const showToast = useCustomToast();
 
   const onHandleSubmit = async ({ values, resetForm }: HandleSubmitParams) => {
     const {
@@ -56,7 +54,6 @@ const AssistanceInputForm = () => {
     const importoNumber = parseFloat(importo_intervento.toString());
 
     try {
-      // Aggiungi il documento a Firestore
       await addDoc(collection(db, "lista_interventi"), {
         targa,
         data_intervento,
@@ -65,12 +62,11 @@ const AssistanceInputForm = () => {
         importo_intervento: importoNumber,
         nome_compagnia,
       });
-      toast({
-        title: "Dati salvati con successo.",
+      showToast({
+        description: "Dati salvati con successo.",
         status: "success",
-        duration: 5000,
         isClosable: true,
-        position: "top",
+        colorScheme: "green",
       });
 
       resetForm({
@@ -84,13 +80,11 @@ const AssistanceInputForm = () => {
         },
       });
     } catch (error) {
-      toast({
-        title: "Errore durante il salvataggio",
+      showToast({
         description: "Non è stato possibile salvare i dati, riprova.",
         status: "error",
-        duration: 5000,
         isClosable: true,
-        position: "top",
+        colorScheme: "red",
       });
       console.error("Error adding document: ", error);
     }
