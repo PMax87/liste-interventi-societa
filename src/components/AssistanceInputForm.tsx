@@ -1,4 +1,4 @@
-import { Formik, Form, FormikState } from "formik";
+import { Formik, Form } from "formik";
 import CustomInput from "./CustomInput";
 import {
   Checkbox,
@@ -7,13 +7,11 @@ import {
   Select,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../firebase";
 import assistanceInputValidationSchema from "../validationSchema/assistanceFormValidationSchema";
 import { CustomButton } from ".";
-import { useCustomToast } from "../useCustomToast";
 import { useEffect } from "react";
 import { useData } from "../context/DataContext";
+import { useManageAssistancesCompaniesContext } from "../context/ManageAssistancesCompaniesContext";
 
 interface AssistanceInputForm {
   targa: string;
@@ -24,13 +22,11 @@ interface AssistanceInputForm {
   nome_compagnia: string;
 }
 
-interface HandleSubmitParams {
-  values: AssistanceInputForm;
-  resetForm: (nextState?: Partial<FormikState<AssistanceInputForm>>) => void;
-}
-
 const AssistanceInputForm = () => {
-  const initialAssistanceInputValues: AssistanceInputForm = {
+  const { assistanceDataForModify, isEditing } =
+    useManageAssistancesCompaniesContext();
+
+  let initialAssistanceInputValues: AssistanceInputForm = {
     targa: "",
     data_intervento: "",
     numero_dossier: "",
@@ -39,72 +35,32 @@ const AssistanceInputForm = () => {
     nome_compagnia: "",
   };
 
-  const { companiesList, getCompaniesList, getAssistancesList } = useData();
+  if (isEditing && assistanceDataForModify) {
+    initialAssistanceInputValues = {
+      targa: assistanceDataForModify.targa,
+      data_intervento: assistanceDataForModify.data_intervento,
+      numero_dossier: assistanceDataForModify.numero_dossier,
+      esito_intervento: assistanceDataForModify.esito_intervento,
+      importo_intervento: assistanceDataForModify.importo_intervento,
+      nome_compagnia: assistanceDataForModify.nome_compagnia,
+    };
+  }
 
-  const showToast = useCustomToast();
+  const { companiesList, getCompaniesList } = useData();
+  const { addAssistance } = useManageAssistancesCompaniesContext();
 
   useEffect(() => {
     getCompaniesList();
   }, []);
-
-  const onHandleSubmit = async ({ values, resetForm }: HandleSubmitParams) => {
-    const {
-      targa,
-      data_intervento,
-      esito_intervento,
-      numero_dossier,
-      importo_intervento,
-      nome_compagnia,
-    } = values;
-
-    const formattedImport = importo_intervento.replace(",", ".");
-    const importoNumber = parseFloat(formattedImport.toString());
-
-    try {
-      await addDoc(collection(db, "lista_interventi"), {
-        targa,
-        data_intervento,
-        esito_intervento,
-        numero_dossier,
-        importo_intervento: importoNumber,
-        nome_compagnia,
-      });
-      showToast({
-        description: "Dati salvati con successo.",
-        status: "success",
-        isClosable: true,
-        colorScheme: "green",
-      });
-
-      resetForm({
-        values: {
-          targa: "",
-          importo_intervento: "",
-          data_intervento: "",
-          numero_dossier: "",
-          nome_compagnia: "",
-          esito_intervento: false,
-        },
-      });
-      getAssistancesList();
-    } catch (error) {
-      showToast({
-        description: "Non è stato possibile salvare i dati, riprova.",
-        status: "error",
-        isClosable: true,
-        colorScheme: "red",
-      });
-      console.error("Error adding document: ", error);
-    }
-  };
 
   return (
     <div>
       <Formik
         initialValues={initialAssistanceInputValues}
         validationSchema={assistanceInputValidationSchema}
-        onSubmit={(values, { resetForm }) =>
-          onHandleSubmit({ values, resetForm })
+        enableReinitialize
+        onSubmit={(assistanceDatas, { resetForm }) =>
+          addAssistance({ assistanceDatas, resetForm })
         }
       >
         {(props) => (
@@ -183,8 +139,8 @@ const AssistanceInputForm = () => {
             </div>
             <div className="mt-5 text-center">
               <CustomButton
-                buttonText="Invia i dati"
-                buttonColor="blue"
+                buttonText={isEditing ? "Modifica i dati" : "Invia i dati"}
+                buttonColor={isEditing ? "green" : "blue"}
                 isDisabled={!props.isValid}
                 type="submit"
               />

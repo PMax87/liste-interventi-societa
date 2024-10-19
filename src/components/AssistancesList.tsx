@@ -3,6 +3,7 @@ import { Center, Divider, IconButton, Spinner } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useData } from "../context/DataContext";
 import { formatPriceEurCurrency } from "../utils/formatPrice";
+import { useManageAssistancesCompaniesContext } from "../context/ManageAssistancesCompaniesContext";
 
 interface AssistancesList {
   targa: string;
@@ -18,14 +19,18 @@ const AssistancesList = () => {
   const { getAssistancesList, assistancesList, isLoadingAssistances } =
     useData();
 
+  const { deleteAssistance, getAssistanceById } =
+    useManageAssistancesCompaniesContext();
+
   useEffect(() => {
     getAssistancesList();
   }, []);
 
   if (isLoadingAssistances) {
+    console.log(isLoadingAssistances);
     return (
       <Center>
-        <Center height="100vh">
+        <Center marginTop={"40px"}>
           <Spinner color="red.500" size={"xl"} />
         </Center>
       </Center>
@@ -71,12 +76,14 @@ const AssistancesList = () => {
                   icon={<EditIcon />}
                   aria-label="Modifica intervento"
                   colorScheme={"green"}
+                  onClick={() => getAssistanceById(assistance.id)}
                 />
                 <IconButton
                   color={"white"}
                   icon={<DeleteIcon />}
                   aria-label="Cancella intervento"
                   colorScheme={"red"}
+                  onClick={() => deleteAssistance(assistance.id)}
                 />
               </div>
             </div>

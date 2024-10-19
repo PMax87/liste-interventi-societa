@@ -47,6 +47,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch assistances list
   const getAssistancesList = async () => {
+    setIsLoadingAssistances(true);
     const querySnapshot = await getDocs(collection(db, "lista_interventi"));
     try {
       setIsLoadingAssistances(true);
