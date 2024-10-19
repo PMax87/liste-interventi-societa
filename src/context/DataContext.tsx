@@ -9,6 +9,10 @@ interface DataContextType {
   isLoadingAssistances: boolean;
   assistancesList: AssistanceDatas[] | undefined;
   getAssistancesList: () => Promise<void>;
+  setAssistancesList: React.Dispatch<
+    React.SetStateAction<AssistanceDatas[] | undefined>
+  >;
+  setIsLoadingAssistances: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Companies
   isLoadingCompanies: boolean;
@@ -80,6 +84,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         isLoadingAssistances,
         assistancesList,
         getAssistancesList,
+        setAssistancesList,
+        setIsLoadingAssistances,
 
         // Companies
         isLoadingCompanies,
