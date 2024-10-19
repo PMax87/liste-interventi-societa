@@ -11,36 +11,16 @@ import { db } from "../firebase";
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { useData } from "./DataContext";
 import { useCustomToast } from "../useCustomToast";
+import { AssistanceInputsForm } from "../models/AssistanceInputsForm";
 
-// Definisco l'interfaccia per un'assistenza (intervento)
-export interface AssistanceDatas {
-  targa: string;
-  data_intervento: string;
-  numero_dossier: string;
-  esito_intervento: boolean;
-  importo_intervento: number | string;
-  nome_compagnia: string;
-  id: string;
-}
-
-interface AssistanceInputForm {
-  targa: string;
-  data_intervento: string;
-  numero_dossier: string;
-  esito_intervento: boolean;
-  importo_intervento: number | string;
-  nome_compagnia: string;
-}
-
-// Definisco l'interfaccia per un'azienda
 export interface Company {
   id: string;
   name: string;
 }
 
 interface HandleSubmitParams {
-  assistanceDatas: AssistanceInputForm;
-  resetForm: (nextState?: Partial<FormikState<AssistanceInputForm>>) => void;
+  assistanceDatas: AssistanceInputsForm;
+  resetForm: (nextState?: Partial<FormikState<AssistanceInputsForm>>) => void;
 }
 
 // Definisco il tipo delle azioni possibili sul contesto
@@ -52,19 +32,13 @@ interface ManageAssistancesCompaniesContextType {
   }: HandleSubmitParams) => void;
   deleteAssistance: (id: string) => void;
   getAssistanceById: (id: string) => void;
-  idForEditing: string;
   isEditing: boolean;
-  setIdForEditing: () => void;
-  updateAssistance: ({
-    assistanceDatas,
-    resetForm,
-  }: HandleSubmitParams) => void;
-  assistanceDataForModify: AssistanceInputForm | undefined;
+  assistanceDataForModify: AssistanceInputsForm | undefined;
   // Aziende
-  companies: Company[];
-  addCompany: (company: Company) => void;
-  updateCompany: (updatedCompany: Company) => void;
-  deleteCompany: (id: string) => void;
+  //   companies: Company[];
+  //   addCompany: (company: Company) => void;
+  //   updateCompany: (updatedCompany: Company) => void;
+  //   deleteCompany: (id: string) => void;
 }
 
 // Creo un contesto vuoto
@@ -79,7 +53,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
   const [idForEditing, setIdForEditing] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [assistanceDataForModify, setAssistanceDataForModify] = useState<
-    AssistanceInputForm | undefined
+    AssistanceInputsForm | undefined
   >();
 
   const { getAssistancesList } = useData();
@@ -141,7 +115,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
     numero_dossier,
     importo_intervento,
     nome_compagnia,
-  }: AssistanceInputForm) => {
+  }: AssistanceInputsForm) => {
     try {
       await addDoc(collection(db, "lista_interventi"), {
         targa,
@@ -175,7 +149,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
     numero_dossier,
     importo_intervento,
     nome_compagnia,
-  }: AssistanceInputForm) => {
+  }: AssistanceInputsForm) => {
     try {
       await getAssistanceById(idForEditing);
       const assistanceRef = doc(db, "lista_interventi", idForEditing);
@@ -211,7 +185,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
       setIsEditing(true);
       const assistanceRef = doc(db, "lista_interventi", assistanceId);
       const assistanceById = await getDoc(assistanceRef);
-      setAssistanceDataForModify(assistanceById.data() as AssistanceInputForm);
+      setAssistanceDataForModify(assistanceById.data() as AssistanceInputsForm);
     } catch (error) {
       showToast({
         description: "Errore nel recupero dei dati",

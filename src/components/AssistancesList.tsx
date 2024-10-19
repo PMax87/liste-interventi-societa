@@ -4,16 +4,7 @@ import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useData } from "../context/DataContext";
 import { formatPriceEurCurrency } from "../utils/formatPrice";
 import { useManageAssistancesCompaniesContext } from "../context/ManageAssistancesCompaniesContext";
-
-interface AssistancesList {
-  targa: string;
-  data_intervento: string;
-  numero_dossier: string;
-  esito_intervento: boolean;
-  importo_intervento: number;
-  nome_compagnia: string;
-  id: string;
-}
+import { AssistanceDatas } from "../models/AssistanceDatas";
 
 const AssistancesList = () => {
   const { getAssistancesList, assistancesList, isLoadingAssistances } =
@@ -50,7 +41,7 @@ const AssistancesList = () => {
       </div>
       <Divider className="py-1" />
       {assistancesList &&
-        assistancesList.map((assistance: AssistancesList, index: number) => {
+        assistancesList.map((assistance: AssistanceDatas, index: number) => {
           return (
             <div
               key={assistance.id}

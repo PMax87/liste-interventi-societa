@@ -1,31 +1,18 @@
 import { createContext, useState, useContext, ReactNode } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-
-interface AssistancesList {
-  targa: string;
-  data_intervento: string;
-  numero_dossier: string;
-  esito_intervento: boolean;
-  importo_intervento: number;
-  nome_compagnia: string;
-  id: string;
-}
-
-interface CompaniesList {
-  id: string;
-  nome_compagnia: string;
-}
+import { AssistanceDatas } from "../models/AssistanceDatas";
+import { CompaniesListModel } from "../models/CompaniesModel";
 
 interface DataContextType {
   // Assistances
   isLoadingAssistances: boolean;
-  assistancesList: AssistancesList[] | undefined;
+  assistancesList: AssistanceDatas[] | undefined;
   getAssistancesList: () => Promise<void>;
 
   // Companies
   isLoadingCompanies: boolean;
-  companiesList: CompaniesList[] | undefined;
+  companiesList: CompaniesListModel[] | undefined;
   getCompaniesList: () => Promise<void>;
 }
 
@@ -36,13 +23,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [isLoadingAssistances, setIsLoadingAssistances] =
     useState<boolean>(false);
   const [assistancesList, setAssistancesList] = useState<
-    AssistancesList[] | undefined
+    AssistanceDatas[] | undefined
   >();
 
   // Companies state
   const [isLoadingCompanies, setIsLoadingCompanies] = useState<boolean>(false);
   const [companiesList, setCompaniesList] = useState<
-    CompaniesList[] | undefined
+    CompaniesListModel[] | undefined
   >();
 
   // Fetch assistances list
@@ -51,12 +38,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const querySnapshot = await getDocs(collection(db, "lista_interventi"));
     try {
       setIsLoadingAssistances(true);
-      const assistancesArray: AssistancesList[] = querySnapshot.docs.map(
+      const assistancesArray: AssistanceDatas[] = querySnapshot.docs.map(
         (doc) =>
           ({
             id: doc.id,
             ...doc.data(),
-          } as AssistancesList)
+          } as AssistanceDatas)
       );
       setAssistancesList(assistancesArray);
     } catch (error) {
@@ -71,12 +58,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const querySnapshot = await getDocs(collection(db, "nomi_societa"));
     try {
       setIsLoadingCompanies(true);
-      const companiesArray: CompaniesList[] = querySnapshot.docs.map(
+      const companiesArray: CompaniesListModel[] = querySnapshot.docs.map(
         (doc) =>
           ({
             id: doc.id,
             ...doc.data(),
-          } as CompaniesList)
+          } as CompaniesListModel)
       );
       setCompaniesList(companiesArray);
     } catch (error) {
