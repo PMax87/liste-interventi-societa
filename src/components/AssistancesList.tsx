@@ -1,23 +1,36 @@
 import { useEffect } from "react";
-import { Divider } from "@chakra-ui/react";
+import { Center, Divider, IconButton, Spinner } from "@chakra-ui/react";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useData } from "../context/DataContext";
+import { formatPriceEurCurrency } from "../utils/formatPrice";
 
 interface AssistancesList {
   targa: string;
   data_intervento: string;
   numero_dossier: string;
   esito_intervento: boolean;
-  importo_intervento: string;
+  importo_intervento: number;
   nome_compagnia: string;
   id: string;
 }
 
 const AssistancesList = () => {
-  const { getAssistancesList, assistancesList } = useData();
+  const { getAssistancesList, assistancesList, isLoadingAssistances } =
+    useData();
 
   useEffect(() => {
     getAssistancesList();
   }, []);
+
+  if (isLoadingAssistances) {
+    return (
+      <Center>
+        <Center height="100vh">
+          <Spinner color="red.500" size={"xl"} />
+        </Center>
+      </Center>
+    );
+  }
 
   return (
     <>
@@ -36,7 +49,7 @@ const AssistancesList = () => {
           return (
             <div
               key={assistance.id}
-              className={`grid grid-cols-7 content-center py-2 ${
+              className={`grid grid-cols-7 content-center items-center py-2 ${
                 index % 2 === 0 ? "bg-slate-200" : "bg-white"
               }`}
             >
@@ -49,10 +62,22 @@ const AssistancesList = () => {
               <h2 className="text-center">
                 {assistance.esito_intervento === true ? "Sì" : "No"}
               </h2>
-              <h2 className="text-center">{assistance.importo_intervento}</h2>
-              <div className="flex justify-center gap-4">
-                <p>Modifica</p>
-                <p>Elimina</p>
+              <h2 className="text-center">
+                {formatPriceEurCurrency(assistance.importo_intervento)}
+              </h2>
+              <div className="flex justify-center gap-1">
+                <IconButton
+                  color={"white"}
+                  icon={<EditIcon />}
+                  aria-label="Modifica intervento"
+                  colorScheme={"green"}
+                />
+                <IconButton
+                  color={"white"}
+                  icon={<DeleteIcon />}
+                  aria-label="Cancella intervento"
+                  colorScheme={"red"}
+                />
               </div>
             </div>
           );

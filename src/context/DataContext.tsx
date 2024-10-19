@@ -7,7 +7,7 @@ interface AssistancesList {
   data_intervento: string;
   numero_dossier: string;
   esito_intervento: boolean;
-  importo_intervento: string;
+  importo_intervento: number;
   nome_compagnia: string;
   id: string;
 }
