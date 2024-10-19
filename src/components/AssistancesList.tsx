@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Divider } from "@chakra-ui/react";
-import { useAssistances } from "../context/ServicesContext";
+import { useData } from "../context/DataContext";
 
 interface AssistancesList {
   targa: string;
@@ -9,10 +9,11 @@ interface AssistancesList {
   esito_intervento: boolean;
   importo_intervento: string;
   nome_compagnia: string;
+  id: string;
 }
 
 const AssistancesList = () => {
-  const { getAssistancesList, assistancesList } = useAssistances();
+  const { getAssistancesList, assistancesList } = useData();
 
   useEffect(() => {
     getAssistancesList();
@@ -34,6 +35,7 @@ const AssistancesList = () => {
         assistancesList.map((assistance: AssistancesList, index: number) => {
           return (
             <div
+              key={assistance.id}
               className={`grid grid-cols-7 content-center py-2 ${
                 index % 2 === 0 ? "bg-slate-200" : "bg-white"
               }`}

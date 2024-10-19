@@ -9,12 +9,11 @@ import {
 } from "@chakra-ui/react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase";
-import { useCompanies } from "../context/CompanyContext";
 import assistanceInputValidationSchema from "../validationSchema/assistanceFormValidationSchema";
 import { CustomButton } from ".";
 import { useCustomToast } from "../useCustomToast";
 import { useEffect } from "react";
-import { useAssistances } from "../context/ServicesContext";
+import { useData } from "../context/DataContext";
 
 interface AssistanceInputForm {
   targa: string;
@@ -40,8 +39,8 @@ const AssistanceInputForm = () => {
     nome_compagnia: "",
   };
 
-  const { companiesList, getCompaniesList } = useCompanies();
-  const { getAssistancesList } = useAssistances();
+  const { companiesList, getCompaniesList, getAssistancesList } = useData();
+
   const showToast = useCustomToast();
 
   useEffect(() => {
