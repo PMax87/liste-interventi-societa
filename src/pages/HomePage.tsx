@@ -5,6 +5,7 @@ import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import AssistancesList from "../components/AssistancesList";
 import { AssistanceInputForm } from "../components";
+import TotalAssistancesRow from "../components/TotalAssistancesRow";
 
 const HomePage = () => {
   const { authUser } = useAuth();
@@ -18,6 +19,7 @@ const HomePage = () => {
   return (
     <div className="p-8 sm:ml-64">
       <AssistanceInputForm />
+      <TotalAssistancesRow />
       <AssistancesList />
     </div>
   );
