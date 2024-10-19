@@ -18,7 +18,7 @@ interface AssistanceInputForm {
   data_intervento: string;
   numero_dossier: string;
   esito_intervento: boolean;
-  importo_intervento: string;
+  importo_intervento: string | number;
   nome_compagnia: string;
 }
 
@@ -47,7 +47,7 @@ const AssistanceInputForm = () => {
   }
 
   const { companiesList, getCompaniesList } = useData();
-  const { addAssistance } = useManageAssistancesCompaniesContext();
+  const { handleAssistance } = useManageAssistancesCompaniesContext();
 
   useEffect(() => {
     getCompaniesList();
@@ -60,7 +60,7 @@ const AssistanceInputForm = () => {
         validationSchema={assistanceInputValidationSchema}
         enableReinitialize
         onSubmit={(assistanceDatas, { resetForm }) =>
-          addAssistance({ assistanceDatas, resetForm })
+          handleAssistance({ assistanceDatas, resetForm })
         }
       >
         {(props) => (

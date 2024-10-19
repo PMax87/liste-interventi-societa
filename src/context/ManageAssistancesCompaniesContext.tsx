@@ -18,7 +18,7 @@ export interface AssistanceDatas {
   data_intervento: string;
   numero_dossier: string;
   esito_intervento: boolean;
-  importo_intervento: number;
+  importo_intervento: number | string;
   nome_compagnia: string;
   id: string;
 }
@@ -28,7 +28,7 @@ interface AssistanceInputForm {
   data_intervento: string;
   numero_dossier: string;
   esito_intervento: boolean;
-  importo_intervento: string;
+  importo_intervento: number | string;
   nome_compagnia: string;
 }
 
@@ -46,7 +46,10 @@ interface HandleSubmitParams {
 // Definisco il tipo delle azioni possibili sul contesto
 interface ManageAssistancesCompaniesContextType {
   // Assistenze (interventi)
-  addAssistance: ({ assistanceDatas, resetForm }: HandleSubmitParams) => void;
+  handleAssistance: ({
+    assistanceDatas,
+    resetForm,
+  }: HandleSubmitParams) => void;
   deleteAssistance: (id: string) => void;
   getAssistanceById: (id: string) => void;
   idForEditing: string;
@@ -82,8 +85,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
   const { getAssistancesList } = useData();
   const showToast = useCustomToast();
 
-  // CRUD per assistenze (interventi)
-  const addAssistance = async ({
+  const handleAssistance = async ({
     assistanceDatas,
     resetForm,
   }: HandleSubmitParams) => {
@@ -96,14 +98,20 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
       nome_compagnia,
     } = assistanceDatas;
 
-    const formattedImport = importo_intervento.replace(",", ".");
-    const importoNumber = parseFloat(formattedImport.toString());
+    let importoNumber;
+
+    // Converti `importo_intervento` a stringa prima di usare `includes()`
+    const importoStr = importo_intervento.toString();
+
+    if (importoStr.includes(",")) {
+      const formattedImport = importoStr.replace(",", ".");
+      importoNumber = parseFloat(formattedImport);
+    } else {
+      importoNumber = parseFloat(importoStr);
+    }
 
     if (isEditing) {
-      await getAssistanceById(idForEditing);
-      console.log(idForEditing);
-      const assistanceRef = doc(db, "lista_interventi", idForEditing);
-      await updateDoc(assistanceRef, {
+      await updateExistingAssistance({
         targa,
         data_intervento,
         esito_intervento,
@@ -111,55 +119,108 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
         importo_intervento: importoNumber,
         nome_compagnia,
       });
-      getAssistancesList();
-      setIsEditing(false);
     } else {
-      try {
-        await addDoc(collection(db, "lista_interventi"), {
-          targa,
-          data_intervento,
-          esito_intervento,
-          numero_dossier,
-          importo_intervento: importoNumber,
-          nome_compagnia,
-        });
-        showToast({
-          description: "Dati salvati con successo.",
-          status: "success",
-          isClosable: true,
-          colorScheme: "green",
-        });
-      } catch (error) {
-        showToast({
-          description: "Non è stato possibile salvare i dati, riprova.",
-          status: "error",
-          isClosable: true,
-          colorScheme: "red",
-        });
-        console.error("Error adding document: ", error);
-      }
+      await addNewAssistance({
+        targa,
+        data_intervento,
+        esito_intervento,
+        numero_dossier,
+        importo_intervento: importoNumber,
+        nome_compagnia,
+      });
     }
 
     getAssistancesList();
+    resetForm();
+  };
 
-    resetForm({
-      values: {
-        targa: "",
-        importo_intervento: "",
-        data_intervento: "",
-        numero_dossier: "",
-        nome_compagnia: "",
-        esito_intervento: false,
-      },
-    });
+  const addNewAssistance = async ({
+    targa,
+    data_intervento,
+    esito_intervento,
+    numero_dossier,
+    importo_intervento,
+    nome_compagnia,
+  }: AssistanceInputForm) => {
+    try {
+      await addDoc(collection(db, "lista_interventi"), {
+        targa,
+        data_intervento,
+        esito_intervento,
+        numero_dossier,
+        importo_intervento,
+        nome_compagnia,
+      });
+      showToast({
+        description: "Dati salvati con successo.",
+        status: "success",
+        isClosable: true,
+        colorScheme: "green",
+      });
+    } catch (error) {
+      showToast({
+        description: "Non è stato possibile salvare i dati, riprova.",
+        status: "error",
+        isClosable: true,
+        colorScheme: "red",
+      });
+      console.error("Error adding document: ", error);
+    }
+  };
+
+  const updateExistingAssistance = async ({
+    targa,
+    data_intervento,
+    esito_intervento,
+    numero_dossier,
+    importo_intervento,
+    nome_compagnia,
+  }: AssistanceInputForm) => {
+    try {
+      await getAssistanceById(idForEditing);
+      const assistanceRef = doc(db, "lista_interventi", idForEditing);
+      await updateDoc(assistanceRef, {
+        targa,
+        data_intervento,
+        esito_intervento,
+        numero_dossier,
+        importo_intervento,
+        nome_compagnia,
+      });
+      showToast({
+        description: "Dati modificati con successo.",
+        status: "success",
+        isClosable: true,
+        colorScheme: "green",
+      });
+      setIsEditing(false);
+    } catch (error) {
+      showToast({
+        description: "Non è stato possibile salvare i dati, riprova.",
+        status: "error",
+        isClosable: true,
+        colorScheme: "red",
+      });
+      console.error("Error adding document: ", error);
+    }
   };
 
   const getAssistanceById = async (assistanceId: string) => {
-    setIdForEditing(assistanceId);
-    setIsEditing(true);
-    const assistanceRef = doc(db, "lista_interventi", assistanceId);
-    const assistanceById = await getDoc(assistanceRef);
-    setAssistanceDataForModify(assistanceById.data() as AssistanceInputForm);
+    try {
+      setIdForEditing(assistanceId);
+      setIsEditing(true);
+      const assistanceRef = doc(db, "lista_interventi", assistanceId);
+      const assistanceById = await getDoc(assistanceRef);
+      setAssistanceDataForModify(assistanceById.data() as AssistanceInputForm);
+    } catch (error) {
+      showToast({
+        description: "Errore nel recupero dei dati",
+        colorScheme: "red",
+        isClosable: false,
+        status: "error",
+      });
+      console.error(error);
+    }
   };
 
   const deleteAssistance = async (id: string) => {
@@ -188,7 +249,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
   return (
     <ManageAssistancesCompaniesContext.Provider
       value={{
-        addAssistance,
+        handleAssistance,
         deleteAssistance,
         getAssistanceById,
         assistanceDataForModify,
