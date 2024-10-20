@@ -11,30 +11,37 @@ import { useData } from "./DataContext";
 import { AssistanceDatas } from "../models/AssistanceDatas";
 
 interface FilterContextType {
-  filterByDataRange: () => void;
+  filterData: (filtersFormValues: FilterValues) => void;
 }
 
 interface FilterValues {
   start_date: string;
   end_date: string;
-  nome_compagnia?: string;
-  esito_intervento?: string;
+  nome_compagnia: string;
+  esito_intervento: boolean;
+  numero_dossier: string;
+  targa: string;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
-  const { setIsLoadingAssistances, setAssistancesList, assistancesList } =
-    useData();
+  const { setIsLoadingAssistances, setAssistancesList } = useData();
 
-  const filterByDataRange = async (values) => {
+  const filterData = async (values: FilterValues) => {
     setIsLoadingAssistances(true);
-    const { start_date, end_date, nome_compagnia, esito_intervento, targa } =
-      values;
+    const {
+      start_date,
+      end_date,
+      nome_compagnia,
+      esito_intervento,
+      targa,
+      numero_dossier,
+    } = values;
 
     const queryConstraints: QueryConstraint[] = [
-      where("data_intervento", ">=", "01/08/2024"),
-      where("data_intervento", "<=", "31/10/2024"),
+      where("data_intervento", ">=", start_date),
+      where("data_intervento", "<=", end_date),
     ];
 
     if (nome_compagnia) {
@@ -43,6 +50,14 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
 
     if (esito_intervento) {
       queryConstraints.push(where("esito_intervento", "==", esito_intervento));
+    }
+
+    if (targa) {
+      queryConstraints.push(where("targa", "==", targa));
+    }
+
+    if (numero_dossier) {
+      queryConstraints.push(where("numero_dossier", "==", numero_dossier));
     }
 
     const q = query(collection(db, "lista_interventi"), ...queryConstraints);
@@ -62,20 +77,12 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsLoadingAssistances(false);
     }
-
-    if (targa) {
-      console.log("dentro");
-      const newAssistanceList = assistancesList.filter((intervento) =>
-        intervento.targa.includes(targa)
-      );
-      setAssistancesList(newAssistanceList);
-    }
   };
 
   return (
     <FilterContext.Provider
       value={{
-        filterByDataRange,
+        filterData,
       }}
     >
       {children}

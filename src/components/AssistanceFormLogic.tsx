@@ -7,10 +7,12 @@ import {
   Select,
   FormErrorMessage,
   Checkbox,
+  useDisclosure,
 } from "@chakra-ui/react";
 import CustomButton from "./CustomButton";
 import { useData } from "../context/DataContext";
 import { useManageAssistancesCompaniesContext } from "../context/ManageAssistancesCompaniesContext";
+import CalculateAssistanceCost from "./CalculateAssistanceCost";
 
 interface AssistanceFormLogicProps {
   formikProps: FormikProps<AssistanceInputsForm>;
@@ -21,6 +23,7 @@ const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({
 }) => {
   const { companiesList } = useData();
   const { isEditing } = useManageAssistancesCompaniesContext();
+  const { onOpen, isOpen, onClose } = useDisclosure();
 
   return (
     <Form>
@@ -46,12 +49,21 @@ const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({
         />
       </div>
       <div className="grid grid-cols-3 gap-5 content-center mt-3">
-        <CustomInput
-          placeholder="Inserisci importo intervento"
-          formLabel="Importo Intervento"
-          type="text"
-          name="importo_intervento"
-        />
+        <div>
+          <CustomInput
+            placeholder="Inserisci importo intervento"
+            formLabel="Importo Intervento"
+            type="text"
+            name="importo_intervento"
+          />
+          <p
+            onClick={onOpen}
+            className="text-red-500 font-semibold text-sm mt-1 inline cursor-pointer"
+          >
+            Calcola importo
+          </p>
+          <CalculateAssistanceCost isOpen={isOpen} onClose={onClose} />
+        </div>
         <FormControl
           isInvalid={Boolean(
             formikProps.errors.nome_compagnia &&

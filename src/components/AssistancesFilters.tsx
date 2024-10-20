@@ -38,7 +38,7 @@ const AssistancesFilters = () => {
     esito_intervento: false,
   };
 
-  const { filterByDataRange } = useFilter();
+  const { filterData } = useFilter();
   const { getAssistancesList, companiesList } = useData();
 
   const onHandleResetFilter = (
@@ -65,7 +65,7 @@ const AssistancesFilters = () => {
           <AccordionPanel>
             <Formik
               initialValues={filterFormInitialValues}
-              onSubmit={(values) => filterByDataRange(values)}
+              onSubmit={(values) => filterData(values)}
             >
               {(formikProps) => (
                 <Form>
