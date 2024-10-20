@@ -40,7 +40,10 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({
         <ModalHeader>Calcola importo Intervento</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Formik initialValues={calculateCostFormInitialValues}>
+          <Formik
+            initialValues={calculateCostFormInitialValues}
+            onSubmit={(values) => console.log(values)}
+          >
             {(formikProps) => (
               <Form>
                 <FormControl
