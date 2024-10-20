@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase";
 import { AssistanceDatas } from "../models/AssistanceDatas";
 import { CompaniesListModel } from "../models/CompaniesModel";
@@ -39,9 +39,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Fetch assistances list
   const getAssistancesList = async () => {
     setIsLoadingAssistances(true);
-    const querySnapshot = await getDocs(collection(db, "lista_interventi"));
     try {
-      setIsLoadingAssistances(true);
+      const getAssistancesOrdered = query(
+        collection(db, "lista_interventi"),
+        orderBy("data_intervento", "desc")
+      );
+      const querySnapshot = await getDocs(getAssistancesOrdered);
       const assistancesArray: AssistanceDatas[] = querySnapshot.docs.map(
         (doc) =>
           ({

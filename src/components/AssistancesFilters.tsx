@@ -13,11 +13,8 @@ import {
 } from "@chakra-ui/react";
 import { useData } from "../context/DataContext";
 import { AssistanceDatas } from "../models/AssistanceDatas";
-import { useState } from "react";
 
 const AssistancesFilters = () => {
-  const [isActiveFilter, setIsActiveFilter] = useState<boolean>(false);
-
   const filterFormInitialValues = {
     start_date: "",
     end_date: "",
@@ -54,8 +51,8 @@ const AssistancesFilters = () => {
         <AccordionItem>
           <h2>
             <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                Filtri
+              <Box as="span" flex="1" textAlign="left" fontWeight="bold">
+                Filtra gli interventi
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -67,7 +64,7 @@ const AssistancesFilters = () => {
             >
               {(props) => (
                 <Form>
-                  <div className="grid grid-cols-3 gap-5 mt-8">
+                  <div className="grid grid-cols-3 gap-5 mt-2">
                     <CustomInput
                       type="date"
                       name="start_date"
