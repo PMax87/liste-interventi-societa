@@ -58,7 +58,7 @@ const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({
               formikProps.touched.nome_compagnia
           )}
         >
-          <FormLabel htmlFor="accettato" fontWeight="bold">
+          <FormLabel htmlFor="lista_Societa" fontWeight="bold">
             Lista società
           </FormLabel>
           <Select

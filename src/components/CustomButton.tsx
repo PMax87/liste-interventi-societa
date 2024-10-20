@@ -13,9 +13,15 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   buttonColor,
   type,
   isDisabled,
+  onClick,
 }) => {
   return (
-    <Button type={type} colorScheme={buttonColor} isDisabled={isDisabled}>
+    <Button
+      type={type}
+      colorScheme={buttonColor}
+      isDisabled={isDisabled}
+      onClick={onClick}
+    >
       {buttonText}
     </Button>
   );

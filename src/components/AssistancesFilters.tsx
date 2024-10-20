@@ -1,48 +1,53 @@
-import { Formik, Form } from "formik";
+import { Formik, Form, FormikState } from "formik";
 import CustomInput from "./CustomInput";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+import {
+  FormControl,
+  FormLabel,
+  Select,
+  FormErrorMessage,
+  Checkbox,
+} from "@chakra-ui/react";
 import {
   Accordion,
   AccordionItem,
   AccordionPanel,
-  Button,
   AccordionButton,
   Box,
   AccordionIcon,
 } from "@chakra-ui/react";
+import CustomButton from "./CustomButton";
+import { useFilter } from "../context/FilterContext";
 import { useData } from "../context/DataContext";
-import { AssistanceDatas } from "../models/AssistanceDatas";
+
+interface AssistanceFiltersValues {
+  start_date: string;
+  end_date: string;
+  esito_intervento: boolean;
+  numero_dossier: string;
+  targa: string;
+  nome_compagnia: string;
+}
 
 const AssistancesFilters = () => {
-  const filterFormInitialValues = {
+  const filterFormInitialValues: AssistanceFiltersValues = {
     start_date: "",
     end_date: "",
-    accepted: false,
     targa: "",
+    numero_dossier: "",
+    nome_compagnia: "",
+    esito_intervento: false,
   };
 
-  const { setAssistancesList, setIsLoadingAssistances } = useData();
+  const { filterByDataRange } = useFilter();
+  const { getAssistancesList, companiesList } = useData();
 
-  const countByDateRange = async (values) => {
-    setIsLoadingAssistances(true);
-    const { start_date, end_date } = values;
-    const q = query(
-      collection(db, "lista_interventi"),
-      where("data_intervento", ">=", start_date),
-      where("data_intervento", "<=", end_date)
-    );
-    const querySnapshot = await getDocs(q);
-
-    const assistancesArray = querySnapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as AssistanceDatas)
-    );
-    setAssistancesList(assistancesArray);
-    setIsLoadingAssistances(false);
+  const onHandleResetFilter = (
+    resetForm: (
+      nextState?: Partial<FormikState<AssistanceFiltersValues>>
+    ) => void
+  ) => {
+    getAssistancesList();
+    resetForm();
   };
 
   return (
@@ -60,9 +65,9 @@ const AssistancesFilters = () => {
           <AccordionPanel>
             <Formik
               initialValues={filterFormInitialValues}
-              onSubmit={(values) => countByDateRange(values)}
+              onSubmit={(values) => filterByDataRange(values)}
             >
-              {(props) => (
+              {(formikProps) => (
                 <Form>
                   <div className="grid grid-cols-3 gap-5 mt-2">
                     <CustomInput
@@ -83,16 +88,76 @@ const AssistancesFilters = () => {
                       placeholder="Cerca per targa"
                       formLabel="Cerca per targa"
                     />
+                  </div>
+                  <div className="grid grid-cols-3 gap-5 mt-3">
                     <CustomInput
                       type="text"
                       name="numero_dossier"
                       placeholder="Cerca per Dossier"
                       formLabel="Cerca per dossier"
                     />
+                    <FormControl
+                      isInvalid={Boolean(
+                        formikProps.errors.nome_compagnia &&
+                          formikProps.touched.nome_compagnia
+                      )}
+                    >
+                      <FormLabel htmlFor="lista_Societa" fontWeight="bold">
+                        Lista società
+                      </FormLabel>
+                      <Select
+                        name="nome_compagnia"
+                        placeholder="Seleziona una società"
+                        onChange={formikProps.handleChange}
+                        value={formikProps.values.nome_compagnia}
+                      >
+                        {companiesList &&
+                          companiesList.map((companyName) => {
+                            return (
+                              <option
+                                value={companyName.nome_compagnia}
+                                className="capitalize"
+                                key={companyName.id}
+                              >
+                                {companyName.nome_compagnia}
+                              </option>
+                            );
+                          })}
+                      </Select>
+                      <FormErrorMessage>
+                        {formikProps.errors.nome_compagnia}
+                      </FormErrorMessage>
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="accettato" fontWeight="bold">
+                        Accettato
+                      </FormLabel>
+                      <Checkbox
+                        name="esito_intervento"
+                        onChange={formikProps.handleChange}
+                        isChecked={
+                          formikProps.values.esito_intervento === false
+                            ? false
+                            : true
+                        }
+                      />
+                    </FormControl>
                   </div>
-                  <Button type="submit" className="mt-4">
-                    Cerca
-                  </Button>
+                  <div className="flex justify-center gap-1 mt-5">
+                    <CustomButton
+                      type="submit"
+                      buttonColor="blue"
+                      buttonText="Applica filtri"
+                      isDisabled={!formikProps.isValid}
+                    />
+                    <CustomButton
+                      onClick={() => onHandleResetFilter(formikProps.resetForm)}
+                      type="button"
+                      buttonColor="red"
+                      isDisabled={false}
+                      buttonText="Resetta i filtri"
+                    />
+                  </div>
                 </Form>
               )}
             </Formik>
