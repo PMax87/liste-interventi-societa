@@ -33,6 +33,10 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({
     peso_veicolo: "",
   };
 
+  const calculateCostByCompany = (formValues) => {
+    console.log(formValues);
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -42,7 +46,7 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({
         <ModalBody>
           <Formik
             initialValues={calculateCostFormInitialValues}
-            onSubmit={(values) => console.log(values)}
+            onSubmit={(formValues) => calculateCostByCompany(formValues)}
           >
             {(formikProps) => (
               <Form>
@@ -89,10 +93,9 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({
           </Formik>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Close
+          <Button variant="ghost" type="submit">
+            Secondary Action
           </Button>
-          <Button variant="ghost">Secondary Action</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

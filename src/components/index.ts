@@ -5,6 +5,7 @@ import AssistanceFormLogic from "./AssistanceFormLogic";
 import AssistancesFilters from "./AssistancesFilters";
 import AssistanceItem from "./AssistanceItem";
 import CalculateAssistanceCost from "./CalculateAssistanceCost";
+import TotalsBox from "./TotalsBox";
 
 export {
   LoginForm,
@@ -14,4 +15,5 @@ export {
   AssistancesFilters,
   AssistanceItem,
   CalculateAssistanceCost,
+  TotalsBox,
 };

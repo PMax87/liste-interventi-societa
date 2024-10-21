@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useState } from "react";
 import {
   collection,
   getDocs,
@@ -9,16 +9,21 @@ import {
 import { db } from "../firebase";
 import { useData } from "./DataContext";
 import { AssistanceDatas } from "../models/AssistanceDatas";
+import { FormikState } from "formik";
+import { AssistanceFiltersValues } from "../components/AssistancesFilters";
 
 interface FilterContextType {
   filterData: (filtersFormValues: FilterValues) => void;
+  resetAllFilters: (
+    nextState?: Partial<FormikState<AssistanceFiltersValues>>
+  ) => void;
 }
 
 interface FilterValues {
   start_date: string;
   end_date: string;
   nome_compagnia: string;
-  esito_intervento: boolean;
+  esito_intervento: boolean | string;
   numero_dossier: string;
   targa: string;
 }
@@ -26,18 +31,18 @@ interface FilterValues {
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
-  const { setIsLoadingAssistances, setAssistancesList } = useData();
+  const { setIsLoadingAssistances, setAssistancesList, getAssistancesList } =
+    useData();
+  const [accettati, setAccettati] = useState<number | null>(null);
+  const [nonAccettati, setNonAccettati] = useState<number | null>(null);
+  const [totale, setTotale] = useState<number | null>(null);
 
   const filterData = async (values: FilterValues) => {
     setIsLoadingAssistances(true);
-    const {
-      start_date,
-      end_date,
-      nome_compagnia,
-      esito_intervento,
-      targa,
-      numero_dossier,
-    } = values;
+    const { start_date, end_date, nome_compagnia, targa, numero_dossier } =
+      values;
+
+    let { esito_intervento } = values;
 
     const queryConstraints: QueryConstraint[] = [
       where("data_intervento", ">=", start_date),
@@ -48,7 +53,12 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       queryConstraints.push(where("nome_compagnia", "==", nome_compagnia));
     }
 
-    if (esito_intervento) {
+    if (esito_intervento && esito_intervento !== "") {
+      if (esito_intervento === "si") {
+        esito_intervento = true;
+      } else if (esito_intervento === "no") {
+        esito_intervento = false;
+      }
       queryConstraints.push(where("esito_intervento", "==", esito_intervento));
     }
 
@@ -72,6 +82,26 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
           } as AssistanceDatas)
       );
       setAssistancesList(assistancesArray);
+
+      // Calcola gli interventi accettati e non accettati
+      const acceptedCount = assistancesArray.filter(
+        (item) => item.esito_intervento === true
+      ).length;
+
+      const nonAcceptedCount = assistancesArray.filter(
+        (item) => item.esito_intervento === false
+      ).length;
+
+      const sum = assistancesArray.reduce(
+        (accumulator, currentValue) =>
+          accumulator + currentValue.importo_intervento,
+        0
+      );
+
+      // Setta i valori dei conteggi
+      setAccettati(acceptedCount);
+      setNonAccettati(nonAcceptedCount);
+      setTotale(sum);
     } catch (error) {
       console.error("Error fetching filtered data: ", error);
     } finally {
@@ -79,10 +109,20 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const resetAllFilters = async (resetForm) => {
+    await getAssistancesList();
+    resetForm();
+    setTotale(null);
+  };
+
   return (
     <FilterContext.Provider
       value={{
         filterData,
+        resetAllFilters,
+        accettati,
+        nonAccettati,
+        totale,
       }}
     >
       {children}

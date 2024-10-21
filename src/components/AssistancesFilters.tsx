@@ -5,7 +5,6 @@ import {
   FormLabel,
   Select,
   FormErrorMessage,
-  Checkbox,
 } from "@chakra-ui/react";
 import {
   Accordion,
@@ -18,11 +17,13 @@ import {
 import CustomButton from "./CustomButton";
 import { useFilter } from "../context/FilterContext";
 import { useData } from "../context/DataContext";
+import filtersFormValidationSchema from "../validationSchema/filtersFormValidationSchema";
+import { TotalsBox } from ".";
 
-interface AssistanceFiltersValues {
+export interface AssistanceFiltersValues {
   start_date: string;
   end_date: string;
-  esito_intervento: boolean;
+  esito_intervento: string;
   numero_dossier: string;
   targa: string;
   nome_compagnia: string;
@@ -35,20 +36,11 @@ const AssistancesFilters = () => {
     targa: "",
     numero_dossier: "",
     nome_compagnia: "",
-    esito_intervento: false,
+    esito_intervento: "",
   };
 
-  const { filterData } = useFilter();
+  const { filterData, resetAllFilters } = useFilter();
   const { getAssistancesList, companiesList } = useData();
-
-  const onHandleResetFilter = (
-    resetForm: (
-      nextState?: Partial<FormikState<AssistanceFiltersValues>>
-    ) => void
-  ) => {
-    getAssistancesList();
-    resetForm();
-  };
 
   return (
     <div className="mt-8">
@@ -66,6 +58,7 @@ const AssistancesFilters = () => {
             <Formik
               initialValues={filterFormInitialValues}
               onSubmit={(values) => filterData(values)}
+              validationSchema={filtersFormValidationSchema}
             >
               {(formikProps) => (
                 <Form>
@@ -132,15 +125,15 @@ const AssistancesFilters = () => {
                       <FormLabel htmlFor="accettato" fontWeight="bold">
                         Accettato
                       </FormLabel>
-                      <Checkbox
+                      <Select
                         name="esito_intervento"
                         onChange={formikProps.handleChange}
-                        isChecked={
-                          formikProps.values.esito_intervento === false
-                            ? false
-                            : true
-                        }
-                      />
+                        value={formikProps.values.esito_intervento}
+                      >
+                        <option value="">Tutti</option>
+                        <option value="si">Si</option>
+                        <option value="no">No</option>
+                      </Select>
                     </FormControl>
                   </div>
                   <div className="flex justify-center gap-1 mt-5">
@@ -151,7 +144,7 @@ const AssistancesFilters = () => {
                       isDisabled={!formikProps.isValid}
                     />
                     <CustomButton
-                      onClick={() => onHandleResetFilter(formikProps.resetForm)}
+                      onClick={() => resetAllFilters(formikProps.resetForm)}
                       type="button"
                       buttonColor="red"
                       isDisabled={false}
@@ -161,6 +154,7 @@ const AssistancesFilters = () => {
                 </Form>
               )}
             </Formik>
+            <TotalsBox />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
