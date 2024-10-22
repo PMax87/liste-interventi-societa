@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Spinner, Center, IconButton } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useData } from "../context/DataContext";
@@ -6,16 +5,18 @@ import { useManageAssistancesCompaniesContext } from "../context/ManageAssistanc
 import { formatPriceEurCurrency } from "../utils/formatPrice";
 import { AssistanceDatas } from "../models/AssistanceDatas";
 import { formatDate } from "../utils/formatDate";
+import { useFilter } from "../context/FilterContext";
 
 const AssistanceItem = () => {
-  const { getAssistancesList, assistancesList, isLoadingAssistances } =
-    useData();
+  const { assistancesList, isLoadingAssistances } = useData();
   const { deleteAssistance, getAssistanceById } =
     useManageAssistancesCompaniesContext();
 
-  useEffect(() => {
-    getAssistancesList();
-  }, []);
+  const {
+    setTotalAcceptedAssistances,
+    setTotalNonAcceptedAssista,
+    setTotalAmount,
+  } = useFilter();
 
   if (isLoadingAssistances) {
     return (
@@ -24,6 +25,13 @@ const AssistanceItem = () => {
       </Center>
     );
   }
+
+  const handleModifyAssistance = (assistanceId: string) => {
+    getAssistanceById(assistanceId);
+    setTotalAcceptedAssistances(null);
+    setTotalNonAcceptedAssista(null);
+    setTotalAmount(null);
+  };
 
   return (
     <div>
@@ -55,7 +63,7 @@ const AssistanceItem = () => {
                 icon={<EditIcon />}
                 aria-label="Modifica intervento"
                 colorScheme={"green"}
-                onClick={() => getAssistanceById(assistance.id)}
+                onClick={() => handleModifyAssistance(assistance.id)}
               />
               <IconButton
                 color={"white"}

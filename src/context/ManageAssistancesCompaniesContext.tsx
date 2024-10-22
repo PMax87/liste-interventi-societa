@@ -12,6 +12,7 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 import { useData } from "./DataContext";
 import { useCustomToast } from "../useCustomToast";
 import { AssistanceInputsForm } from "../models/AssistanceInputsForm";
+import { useFilter } from "./FilterContext";
 
 export interface Company {
   id: string;
@@ -74,7 +75,6 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
 
     let importoNumber;
 
-    // Converti `importo_intervento` a stringa prima di usare `includes()`
     const importoStr = importo_intervento.toString();
 
     if (importoStr.includes(",")) {

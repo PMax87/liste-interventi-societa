@@ -1,4 +1,4 @@
-import { Formik, Form, FormikState } from "formik";
+import { Formik, Form } from "formik";
 import CustomInput from "./CustomInput";
 import {
   FormControl,
@@ -19,6 +19,7 @@ import { useFilter } from "../context/FilterContext";
 import { useData } from "../context/DataContext";
 import filtersFormValidationSchema from "../validationSchema/filtersFormValidationSchema";
 import { TotalsBox } from ".";
+import { useEffect } from "react";
 
 export interface AssistanceFiltersValues {
   start_date: string;
@@ -40,7 +41,11 @@ const AssistancesFilters = () => {
   };
 
   const { filterData, resetAllFilters } = useFilter();
-  const { getAssistancesList, companiesList } = useData();
+  const { companiesList, getAssistancesList } = useData();
+
+  useEffect(() => {
+    getAssistancesList();
+  }, []);
 
   return (
     <div className="mt-8">

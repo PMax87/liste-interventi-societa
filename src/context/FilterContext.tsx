@@ -9,14 +9,13 @@ import {
 import { db } from "../firebase";
 import { useData } from "./DataContext";
 import { AssistanceDatas } from "../models/AssistanceDatas";
-import { FormikState } from "formik";
-import { AssistanceFiltersValues } from "../components/AssistancesFilters";
 
 interface FilterContextType {
   filterData: (filtersFormValues: FilterValues) => void;
-  resetAllFilters: (
-    nextState?: Partial<FormikState<AssistanceFiltersValues>>
-  ) => void;
+  resetAllFilters: (resetForm: () => void) => void;
+  totalAcceptedAssistances: number | null;
+  totalNonAcceptedAssistances: number | null;
+  totalAmount: number | null;
 }
 
 interface FilterValues {
@@ -33,9 +32,13 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const { setIsLoadingAssistances, setAssistancesList, getAssistancesList } =
     useData();
-  const [accettati, setAccettati] = useState<number | null>(null);
-  const [nonAccettati, setNonAccettati] = useState<number | null>(null);
-  const [totale, setTotale] = useState<number | null>(null);
+  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<
+    number | null
+  >(null);
+  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssista] = useState<
+    number | null
+  >(null);
+  const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
   const filterData = async (values: FilterValues) => {
     setIsLoadingAssistances(true);
@@ -83,7 +86,6 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       );
       setAssistancesList(assistancesArray);
 
-      // Calcola gli interventi accettati e non accettati
       const acceptedCount = assistancesArray.filter(
         (item) => item.esito_intervento === true
       ).length;
@@ -92,16 +94,15 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
         (item) => item.esito_intervento === false
       ).length;
 
-      const sum = assistancesArray.reduce(
+      const calcTotalAmount = assistancesArray.reduce(
         (accumulator, currentValue) =>
           accumulator + currentValue.importo_intervento,
         0
       );
 
-      // Setta i valori dei conteggi
-      setAccettati(acceptedCount);
-      setNonAccettati(nonAcceptedCount);
-      setTotale(sum);
+      setTotalAcceptedAssistances(acceptedCount);
+      setTotalNonAcceptedAssista(nonAcceptedCount);
+      setTotalAmount(calcTotalAmount);
     } catch (error) {
       console.error("Error fetching filtered data: ", error);
     } finally {
@@ -109,10 +110,12 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const resetAllFilters = async (resetForm) => {
-    await getAssistancesList();
+  const resetAllFilters = (resetForm: () => void) => {
     resetForm();
-    setTotale(null);
+    getAssistancesList();
+    setTotalAcceptedAssistances(null);
+    setTotalNonAcceptedAssista(null);
+    setTotalAmount(null);
   };
 
   return (
@@ -120,9 +123,12 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       value={{
         filterData,
         resetAllFilters,
-        accettati,
-        nonAccettati,
-        totale,
+        totalAcceptedAssistances,
+        totalNonAcceptedAssistances,
+        totalAmount,
+        setTotalAcceptedAssistances,
+        setTotalNonAcceptedAssista,
+        setTotalAmount,
       }}
     >
       {children}
@@ -133,7 +139,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
 export const useFilter = () => {
   const context = useContext(FilterContext);
   if (context === undefined) {
-    throw new Error("useFilter must be used within a DataProvider");
+    throw new Error("useFilter must be used within a FilterProvider");
   }
   return context;
 };
