@@ -1,8 +1,9 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { AssistanceDatas } from "../models/AssistanceDatas";
 import { CompaniesListModel } from "../models/CompaniesModel";
+import { format, lastDayOfMonth } from "date-fns";
 
 interface DataContextType {
   // Assistances
@@ -36,13 +37,19 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     CompaniesListModel[] | undefined
   >();
 
+  const today = new Date();
+  const firstDateOfMonth = format(today, "yyyy-MM-01");
+  const lastDateOfMonth = format(lastDayOfMonth(today), "yyyy-MM-dd");
+
   // Fetch assistances list
   const getAssistancesList = async () => {
     setIsLoadingAssistances(true);
     try {
       const getAssistancesOrdered = query(
         collection(db, "lista_interventi"),
-        orderBy("data_intervento", "desc")
+        orderBy("data_intervento", "desc"),
+        where("data_intervento", ">=", firstDateOfMonth),
+        where("data_intervento", "<=", lastDateOfMonth)
       );
       const querySnapshot = await getDocs(getAssistancesOrdered);
       const assistancesArray: AssistanceDatas[] = querySnapshot.docs.map(

@@ -5,6 +5,7 @@ import {
   where,
   query,
   QueryConstraint,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useData } from "./DataContext";
@@ -50,6 +51,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     const queryConstraints: QueryConstraint[] = [
       where("data_intervento", ">=", start_date),
       where("data_intervento", "<=", end_date),
+      orderBy("data_intervento", "desc"),
     ];
 
     if (nome_compagnia) {
@@ -73,10 +75,11 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       queryConstraints.push(where("numero_dossier", "==", numero_dossier));
     }
 
-    const q = query(collection(db, "lista_interventi"), ...queryConstraints);
+    let q = query(collection(db, "lista_interventi"), ...queryConstraints);
 
     try {
       const querySnapshot = await getDocs(q);
+
       const assistancesArray = querySnapshot.docs.map(
         (doc) =>
           ({

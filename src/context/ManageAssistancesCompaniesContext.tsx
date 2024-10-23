@@ -12,7 +12,6 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 import { useData } from "./DataContext";
 import { useCustomToast } from "../useCustomToast";
 import { AssistanceInputsForm } from "../models/AssistanceInputsForm";
-import { useFilter } from "./FilterContext";
 
 export interface Company {
   id: string;
@@ -73,15 +72,17 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
       nome_compagnia,
     } = assistanceDatas;
 
-    let importoNumber;
+    let amountInNumber;
 
-    const importoStr = importo_intervento.toString();
+    // Converto l'importo da stringa numvero per salvaro in firebase
+    const amountInString = importo_intervento.toString();
 
-    if (importoStr.includes(",")) {
-      const formattedImport = importoStr.replace(",", ".");
-      importoNumber = parseFloat(formattedImport);
+    // Gestico il caso in cui l'utente inserisco l'importo con la virgola
+    if (amountInString.includes(",")) {
+      const formattedImport = amountInString.replace(",", ".");
+      amountInNumber = parseFloat(formattedImport);
     } else {
-      importoNumber = parseFloat(importoStr);
+      amountInNumber = parseFloat(amountInString);
     }
 
     if (isEditing) {
@@ -90,7 +91,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
         data_intervento,
         esito_intervento,
         numero_dossier,
-        importo_intervento: importoNumber,
+        importo_intervento: amountInNumber,
         nome_compagnia,
       });
     } else {
@@ -99,7 +100,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
         data_intervento,
         esito_intervento,
         numero_dossier,
-        importo_intervento: importoNumber,
+        importo_intervento: amountInNumber,
         nome_compagnia,
       });
     }
