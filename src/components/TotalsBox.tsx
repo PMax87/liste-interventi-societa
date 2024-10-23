@@ -1,17 +1,37 @@
-import { useFilter } from "../context/FilterContext";
+import { useData } from "../context/DataContext";
 import { formatPriceEurCurrency } from "../utils/formatPrice";
+import { useEffect, useState } from "react";
 
 const TotalsBox = () => {
-  const { totalAcceptedAssistances, totalNonAcceptedAssistances, totalAmount } = useFilter();
+  const { assistancesList } = useData();
+
+  // conto manualmente gli interventi in quanto FIREBASE non può contare gli elementi precedentemente filtrati
+  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<number | null>(null);
+  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssistances] = useState<number | null>(null);
+  const [totalAmount, setTotalAmount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (assistancesList) {
+      const acceptedCount = assistancesList.filter((item) => item.esito_intervento === true).length;
+      const nonAcceptedCount = assistancesList.filter((item) => item.esito_intervento === false).length;
+      const calcTotalAmount = assistancesList.reduce((accumulator, assistance) => accumulator + assistance.importo_intervento, 0);
+      setTotalAcceptedAssistances(acceptedCount);
+      setTotalNonAcceptedAssistances(nonAcceptedCount);
+      setTotalAmount(calcTotalAmount);
+    }
+  }, [assistancesList]);
 
   let totalAssistances = null;
+  let totalAmountWithoutVat = null;
+  let calcVat = null;
 
   if (totalAcceptedAssistances && totalNonAcceptedAssistances !== null) {
     totalAssistances = totalAcceptedAssistances + totalNonAcceptedAssistances;
   }
 
-  const calcVat = (100 * totalAmount) / 122;
-  const totalAmountWithoutVat = totalAmount - calcVat;
+  calcVat = (100 * totalAmount) / 122;
+  totalAmountWithoutVat = totalAmount - calcVat;
+  console.log(totalAmountWithoutVat);
 
   return (
     <div className="grid grid-cols-5 mt-6 justify-items-center">

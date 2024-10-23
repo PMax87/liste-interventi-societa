@@ -33,6 +33,7 @@ const AssistancesFilters = () => {
   const { filterData, resetAllFilters } = useFilter();
   const { companiesList, getAssistancesList } = useData();
   const currentMoth = format(new Date(), "LLLL", { locale: it });
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     getAssistancesList();
@@ -47,7 +48,7 @@ const AssistancesFilters = () => {
               <Box as="span" textAlign="left" flex={1} fontWeight="bold">
                 <div className="flex">
                   <p className="mr-2">Filtra gli interventi</p>
-                  <p className="text-red-500">{`Gli interventi sono già filtrati per il mese di ${currentMoth.toUpperCase()}`}</p>
+                  <p className="text-red-500">{`Gli interventi sono già filtrati per il mese di ${currentMoth.toUpperCase() + " " + currentYear}`}</p>
                 </div>
               </Box>
               <AccordionIcon />

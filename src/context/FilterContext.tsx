@@ -7,12 +7,6 @@ import { AssistanceDatas } from "../models/AssistanceDatas";
 interface FilterContextType {
   filterData: (filtersFormValues: FilterValues) => void;
   resetAllFilters: (resetForm: () => void) => void;
-  setTotalAcceptedAssistances: React.Dispatch<React.SetStateAction<number | null>>;
-  setTotalAmount: React.Dispatch<React.SetStateAction<number | null>>;
-  setTotalNonAcceptedAssistances: React.Dispatch<React.SetStateAction<number | null>>;
-  totalAcceptedAssistances: number | null;
-  totalAmount: number | null;
-  totalNonAcceptedAssistances: number | null;
 }
 
 interface FilterValues {
@@ -28,9 +22,6 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const { setIsLoadingAssistances, setAssistancesList, getAssistancesList } = useData();
-  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<number | null>(null);
-  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssistances] = useState<number | null>(null);
-  const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
   const filterData = async (values: FilterValues) => {
     setIsLoadingAssistances(true);
@@ -78,16 +69,6 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
           } as AssistanceDatas)
       );
       setAssistancesList(assistancesArray);
-
-      const acceptedCount = assistancesArray.filter((item) => item.esito_intervento === true).length;
-
-      const nonAcceptedCount = assistancesArray.filter((item) => item.esito_intervento === false).length;
-
-      const calcTotalAmount = assistancesArray.reduce((accumulator, assistance) => accumulator + assistance.importo_intervento, 0);
-
-      setTotalAcceptedAssistances(acceptedCount);
-      setTotalNonAcceptedAssistances(nonAcceptedCount);
-      setTotalAmount(calcTotalAmount);
     } catch (error) {
       console.error("Error fetching filtered data: ", error);
     } finally {
@@ -98,9 +79,6 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const resetAllFilters = (resetForm: () => void) => {
     resetForm();
     getAssistancesList();
-    setTotalAcceptedAssistances(null);
-    setTotalNonAcceptedAssistances(null);
-    setTotalAmount(null);
   };
 
   return (
@@ -108,12 +86,6 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       value={{
         filterData,
         resetAllFilters,
-        setTotalAcceptedAssistances,
-        setTotalAmount,
-        setTotalNonAcceptedAssistances,
-        totalAcceptedAssistances,
-        totalAmount,
-        totalNonAcceptedAssistances,
       }}
     >
       {children}
