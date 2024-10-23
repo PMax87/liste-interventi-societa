@@ -1,24 +1,15 @@
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
-  FormControl,
-  FormLabel,
-  Select,
-  FormErrorMessage,
-} from "@chakra-ui/react";
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Select } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import CustomInput from "./CustomInput";
 import { useData } from "../context/DataContext";
+import { CustomSelect } from ".";
 
 interface CalculateAssistanceCostProps {
   isOpen: boolean;
   onClose: () => void;
+  totalAmount: number;
+  setTotalAmount: React.Dispatch<React.SetStateAction<number>>;
+  setFieldValue: (field: string, value: number) => void;
 }
 
 interface calculateCostFormInitialValues {
@@ -28,12 +19,21 @@ interface calculateCostFormInitialValues {
   tipologia_intervento: string;
 }
 
-const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpen, onClose }) => {
+const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpen, onClose, totalAmount, setTotalAmount, setFieldValue }) => {
   const { companiesList } = useData();
 
-  const pesi_veicolo_mapfre = ["Da 0 a 2.5 Ton", "Da 2.6 a 3.5 Ton"];
-  const pesi_veicolo_hlpy = ["Da 0 a 2.6 Ton", "Da 2.7 a 3.5 Ton"];
-  const tipologia_intervento = ["Traino", "Trasporto"];
+  const pesi_veicolo_mapfre = [
+    { id: 1, peso_veicolo: "Da 0 a 2.5 Ton" },
+    { id: 2, peso_veicolo: "Da 2.6 a 3.5 Ton" },
+  ];
+  const pesi_veicolo_hlpy = [
+    { id: 1, peso_veicolo: "Da 0 a 2.6 Ton" },
+    { id: 2, peso_veicolo: "Da 2.7 a 3.5 Ton" },
+  ];
+  const tipologia_intervento = [
+    { id: 1, tipo_intervento: "traino" },
+    { id: 2, tipo_intervento: "trasporto" },
+  ];
 
   const calculateCostFormInitialValues: calculateCostFormInitialValues = {
     nome_compagnia: "",
@@ -54,7 +54,12 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpe
         importoTotale = parseFloat((kmOltre25 * 0.82).toFixed(2)) + 45;
       }
     }
-    console.log(importoTotale);
+    setTotalAmount(importoTotale);
+  };
+
+  const manageSubmit = (campo, valore) => {
+    setFieldValue(campo, valore);
+    onClose();
   };
 
   return (
@@ -64,57 +69,46 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpe
         <ModalHeader>Calcola importo Intervento</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Formik initialValues={calculateCostFormInitialValues} onSubmit={(formValues) => calculateCostByCompany(formValues)}>
+          <Formik initialValues={calculateCostFormInitialValues} onSubmit={() => manageSubmit("importo_intervento", totalAmount)}>
             {(formikProps) => (
               <Form>
-                <FormControl isInvalid={Boolean(formikProps.errors.nome_compagnia && formikProps.touched.nome_compagnia)}>
-                  <FormLabel htmlFor="lista_Societa" fontWeight="bold">
-                    Lista società
-                  </FormLabel>
-                  <Select
-                    name="nome_compagnia"
-                    placeholder="Seleziona una società"
-                    onChange={formikProps.handleChange}
-                    value={formikProps.values.nome_compagnia}
-                  >
-                    {companiesList &&
-                      companiesList.map((companyName) => {
-                        return (
-                          <option value={companyName.nome_compagnia} className="capitalize" key={companyName.id}>
-                            {companyName.nome_compagnia}
-                          </option>
-                        );
-                      })}
-                  </Select>
-                  <FormErrorMessage>{formikProps.errors.nome_compagnia}</FormErrorMessage>
-                </FormControl>
-                <Select name="peso_veicolo" placeholder="seleziona un peso" onChange={formikProps.handleChange}>
-                  {formikProps.values.nome_compagnia === "mapfre"
-                    ? pesi_veicolo_mapfre.map((peso, id) => {
-                        return <option key={id}>{peso}</option>;
-                      })
-                    : pesi_veicolo_hlpy.map((peso, id) => {
-                        return <option key={id}>{peso}</option>;
-                      })}
-                </Select>
-                <Select name="tipologia_intervento" placeholder="seleziona un peso" onChange={formikProps.handleChange}>
-                  {tipologia_intervento.map((tipoIntervento, id) => {
-                    return <option key={id}>{tipoIntervento}</option>;
-                  })}
-                </Select>
+                <CustomSelect
+                  options={companiesList}
+                  getOptionValue={(option) => option.id}
+                  getOptionLabel={(option) => option.nome_compagnia}
+                  placeholder="Seleziona una società"
+                  formLabel="Seleziona una società"
+                  name="nome_compagnia"
+                />
+                <CustomSelect
+                  options={formikProps.values.nome_compagnia === "mapfre" ? pesi_veicolo_mapfre : pesi_veicolo_hlpy}
+                  placeholder="Seleziona un peso veicolo"
+                  getOptionValue={(option) => option.id}
+                  getOptionLabel={(option) => option.peso_veicolo}
+                  formLabel="Peso veicolo"
+                  name="peso_veicolo"
+                />
+                <CustomSelect
+                  options={tipologia_intervento}
+                  placeholder="Seleziona una tipo intervento"
+                  formLabel="Seleziona una tipo intervento"
+                  name="tipologia_intervento"
+                  getOptionLabel={(option) => option.tipo_intervento}
+                  getOptionValue={(option) => option.id}
+                />
                 <CustomInput name="km_totali" placeholder="Km totali" formLabel="Km Totali" type="text" />
+                <Button variant="ghost" type="button" onClick={() => calculateCostByCompany(formikProps.values)}>
+                  Calcola
+                </Button>
+                <p>Importo calcolato: {totalAmount}</p>
                 <Button variant="ghost" type="submit">
-                  Secondary Action
+                  Usa importo
                 </Button>
               </Form>
             )}
           </Formik>
         </ModalBody>
-        <ModalFooter>
-          <Button variant="ghost" type="submit">
-            Secondary Action
-          </Button>
-        </ModalFooter>
+        <ModalFooter></ModalFooter>
       </ModalContent>
     </Modal>
   );

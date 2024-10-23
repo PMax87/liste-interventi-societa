@@ -1,112 +1,59 @@
 import { Form, FormikProps } from "formik";
 import { AssistanceInputsForm } from "../models/AssistanceInputsForm";
 import CustomInput from "./CustomInput";
-import {
-  FormControl,
-  FormLabel,
-  Select,
-  FormErrorMessage,
-  Checkbox,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { FormControl, FormLabel, Checkbox, useDisclosure } from "@chakra-ui/react";
 import CustomButton from "./CustomButton";
 import { useData } from "../context/DataContext";
 import { useManageAssistancesCompaniesContext } from "../context/ManageAssistancesCompaniesContext";
 import CalculateAssistanceCost from "./CalculateAssistanceCost";
+import { useState } from "react";
+import { CustomSelect } from ".";
 
 interface AssistanceFormLogicProps {
   formikProps: FormikProps<AssistanceInputsForm>;
 }
 
-const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({
-  formikProps,
-}) => {
+const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({ formikProps }) => {
   const { companiesList } = useData();
   const { isEditing } = useManageAssistancesCompaniesContext();
   const { onOpen, isOpen, onClose } = useDisclosure();
+  const [totalAmount, setTotalAmount] = useState(0);
 
   return (
     <Form>
       <div className="grid grid-cols-3 gap-5 content-center">
-        <CustomInput
-          type="date"
-          placeholder="Data Intervento"
-          formLabel="Data Intervento"
-          name="data_intervento"
-        />
-        <CustomInput
-          placeholder="inserisci la targa"
-          formLabel="Targa Veicolo"
-          type="text"
-          name="targa"
-        />
+        <CustomInput type="date" placeholder="Data Intervento" formLabel="Data Intervento" name="data_intervento" />
+        <CustomInput placeholder="inserisci la targa" formLabel="Targa Veicolo" type="text" name="targa" />
 
-        <CustomInput
-          placeholder="Inserisci numero dossier"
-          formLabel="Numero Dossier"
-          type="text"
-          name="numero_dossier"
-        />
+        <CustomInput placeholder="Inserisci numero dossier" formLabel="Numero Dossier" type="text" name="numero_dossier" />
       </div>
       <div className="grid grid-cols-3 gap-5 content-center mt-3">
         <div>
-          <CustomInput
-            placeholder="Inserisci importo intervento"
-            formLabel="Importo Intervento"
-            type="text"
-            name="importo_intervento"
-          />
-          <p
-            onClick={onOpen}
-            className="text-red-500 font-semibold text-sm mt-1 inline cursor-pointer"
-          >
+          <CustomInput placeholder="Inserisci importo intervento" formLabel="Importo Intervento" type="text" name="importo_intervento" />
+          <p onClick={onOpen} className="text-red-500 font-semibold text-sm mt-1 inline cursor-pointer">
             Calcola importo
           </p>
-          <CalculateAssistanceCost isOpen={isOpen} onClose={onClose} />
+          <CalculateAssistanceCost
+            isOpen={isOpen}
+            onClose={onClose}
+            totalAmount={totalAmount}
+            setTotalAmount={setTotalAmount}
+            setFieldValue={formikProps.setFieldValue}
+          />
         </div>
-        <FormControl
-          isInvalid={Boolean(
-            formikProps.errors.nome_compagnia &&
-              formikProps.touched.nome_compagnia
-          )}
-        >
-          <FormLabel htmlFor="lista_Societa" fontWeight="bold">
-            Lista società
-          </FormLabel>
-          <Select
-            name="nome_compagnia"
-            placeholder="Seleziona una società"
-            onChange={formikProps.handleChange}
-            value={formikProps.values.nome_compagnia}
-          >
-            {companiesList &&
-              companiesList.map((companyName) => {
-                return (
-                  <option
-                    value={companyName.nome_compagnia}
-                    className="capitalize"
-                    key={companyName.id}
-                  >
-                    {companyName.nome_compagnia}
-                  </option>
-                );
-              })}
-          </Select>
-          <FormErrorMessage>
-            {formikProps.errors.nome_compagnia}
-          </FormErrorMessage>
-        </FormControl>
+        <CustomSelect
+          name="nome_compagnia"
+          formLabel="Lista società"
+          placeholder="Seleziona una società"
+          options={companiesList}
+          getOptionLabel={(option) => option.nome_compagnia}
+          getOptionValue={(option) => option.id}
+        />
         <FormControl>
           <FormLabel htmlFor="accettato" fontWeight="bold">
             Accettato
           </FormLabel>
-          <Checkbox
-            name="esito_intervento"
-            onChange={formikProps.handleChange}
-            isChecked={
-              formikProps.values.esito_intervento === false ? false : true
-            }
-          />
+          <Checkbox name="esito_intervento" onChange={formikProps.handleChange} isChecked={formikProps.values.esito_intervento === false ? false : true} />
         </FormControl>
       </div>
       <div className="mt-5 text-center">

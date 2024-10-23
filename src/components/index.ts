@@ -6,6 +6,7 @@ import AssistancesFilters from "./AssistancesFilters";
 import AssistanceItem from "./AssistanceItem";
 import CalculateAssistanceCost from "./CalculateAssistanceCost";
 import TotalsBox from "./TotalsBox";
+import CustomSelect from "./CustomSelect";
 
 export {
   LoginForm,
@@ -16,4 +17,5 @@ export {
   AssistanceItem,
   CalculateAssistanceCost,
   TotalsBox,
+  CustomSelect,
 };
