@@ -10,9 +10,7 @@ interface DataContextType {
   isLoadingAssistances: boolean;
   assistancesList: AssistanceDatas[] | undefined;
   getAssistancesList: () => Promise<void>;
-  setAssistancesList: React.Dispatch<
-    React.SetStateAction<AssistanceDatas[] | undefined>
-  >;
+  setAssistancesList: React.Dispatch<React.SetStateAction<AssistanceDatas[] | undefined>>;
   setIsLoadingAssistances: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Companies
@@ -25,17 +23,12 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Assistances state
-  const [isLoadingAssistances, setIsLoadingAssistances] =
-    useState<boolean>(false);
-  const [assistancesList, setAssistancesList] = useState<
-    AssistanceDatas[] | undefined
-  >();
+  const [isLoadingAssistances, setIsLoadingAssistances] = useState<boolean>(false);
+  const [assistancesList, setAssistancesList] = useState<AssistanceDatas[] | undefined>();
 
   // Companies state
   const [isLoadingCompanies, setIsLoadingCompanies] = useState<boolean>(false);
-  const [companiesList, setCompaniesList] = useState<
-    CompaniesListModel[] | undefined
-  >();
+  const [companiesList, setCompaniesList] = useState<CompaniesListModel[] | undefined>();
 
   // Filtri gli intervento in base al mese corrente
   const today = new Date();

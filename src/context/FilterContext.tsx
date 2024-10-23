@@ -1,12 +1,5 @@
 import { createContext, useContext, ReactNode, useState } from "react";
-import {
-  collection,
-  getDocs,
-  where,
-  query,
-  QueryConstraint,
-  orderBy,
-} from "firebase/firestore";
+import { collection, getDocs, where, query, QueryConstraint, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import { useData } from "./DataContext";
 import { AssistanceDatas } from "../models/AssistanceDatas";
@@ -14,9 +7,12 @@ import { AssistanceDatas } from "../models/AssistanceDatas";
 interface FilterContextType {
   filterData: (filtersFormValues: FilterValues) => void;
   resetAllFilters: (resetForm: () => void) => void;
+  setTotalAcceptedAssistances: React.Dispatch<React.SetStateAction<number | null>>;
+  setTotalAmount: React.Dispatch<React.SetStateAction<number | null>>;
+  setTotalNonAcceptedAssistances: React.Dispatch<React.SetStateAction<number | null>>;
   totalAcceptedAssistances: number | null;
-  totalNonAcceptedAssistances: number | null;
   totalAmount: number | null;
+  totalNonAcceptedAssistances: number | null;
 }
 
 interface FilterValues {
@@ -31,20 +27,14 @@ interface FilterValues {
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
-  const { setIsLoadingAssistances, setAssistancesList, getAssistancesList } =
-    useData();
-  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<
-    number | null
-  >(null);
-  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssista] = useState<
-    number | null
-  >(null);
+  const { setIsLoadingAssistances, setAssistancesList, getAssistancesList } = useData();
+  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<number | null>(null);
+  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssistances] = useState<number | null>(null);
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
   const filterData = async (values: FilterValues) => {
     setIsLoadingAssistances(true);
-    const { start_date, end_date, nome_compagnia, targa, numero_dossier } =
-      values;
+    const { start_date, end_date, nome_compagnia, targa, numero_dossier } = values;
 
     let { esito_intervento } = values;
 
@@ -89,22 +79,14 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       );
       setAssistancesList(assistancesArray);
 
-      const acceptedCount = assistancesArray.filter(
-        (item) => item.esito_intervento === true
-      ).length;
+      const acceptedCount = assistancesArray.filter((item) => item.esito_intervento === true).length;
 
-      const nonAcceptedCount = assistancesArray.filter(
-        (item) => item.esito_intervento === false
-      ).length;
+      const nonAcceptedCount = assistancesArray.filter((item) => item.esito_intervento === false).length;
 
-      const calcTotalAmount = assistancesArray.reduce(
-        (accumulator, currentValue) =>
-          accumulator + currentValue.importo_intervento,
-        0
-      );
+      const calcTotalAmount = assistancesArray.reduce((accumulator, assistance) => accumulator + assistance.importo_intervento, 0);
 
       setTotalAcceptedAssistances(acceptedCount);
-      setTotalNonAcceptedAssista(nonAcceptedCount);
+      setTotalNonAcceptedAssistances(nonAcceptedCount);
       setTotalAmount(calcTotalAmount);
     } catch (error) {
       console.error("Error fetching filtered data: ", error);
@@ -117,7 +99,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     resetForm();
     getAssistancesList();
     setTotalAcceptedAssistances(null);
-    setTotalNonAcceptedAssista(null);
+    setTotalNonAcceptedAssistances(null);
     setTotalAmount(null);
   };
 
@@ -126,12 +108,12 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       value={{
         filterData,
         resetAllFilters,
-        totalAcceptedAssistances,
-        totalNonAcceptedAssistances,
-        totalAmount,
         setTotalAcceptedAssistances,
-        setTotalNonAcceptedAssista,
         setTotalAmount,
+        setTotalNonAcceptedAssistances,
+        totalAcceptedAssistances,
+        totalAmount,
+        totalNonAcceptedAssistances,
       }}
     >
       {children}

@@ -1,11 +1,4 @@
-import {
-  deleteDoc,
-  doc,
-  addDoc,
-  collection,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { deleteDoc, doc, addDoc, collection, getDoc, updateDoc } from "firebase/firestore";
 import { FormikState } from "formik";
 import { db } from "../firebase";
 import React, { createContext, useState, useContext, ReactNode } from "react";
@@ -26,10 +19,7 @@ interface HandleSubmitParams {
 // Definisco il tipo delle azioni possibili sul contesto
 interface ManageAssistancesCompaniesContextType {
   // Assistenze (interventi)
-  handleAssistance: ({
-    assistanceDatas,
-    resetForm,
-  }: HandleSubmitParams) => void;
+  handleAssistance: ({ assistanceDatas, resetForm }: HandleSubmitParams) => void;
   deleteAssistance: (id: string) => void;
   getAssistanceById: (id: string) => void;
   isEditing: boolean;
@@ -42,9 +32,7 @@ interface ManageAssistancesCompaniesContextType {
 }
 
 // Creo un contesto vuoto
-const ManageAssistancesCompaniesContext = createContext<
-  ManageAssistancesCompaniesContextType | undefined
->(undefined);
+const ManageAssistancesCompaniesContext = createContext<ManageAssistancesCompaniesContextType | undefined>(undefined);
 
 // Provider per il contesto
 export const ManageAssistancesCompaniesProvider: React.FC<{
@@ -52,29 +40,17 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
 }> = ({ children }) => {
   const [idForEditing, setIdForEditing] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [assistanceDataForModify, setAssistanceDataForModify] = useState<
-    AssistanceInputsForm | undefined
-  >();
+  const [assistanceDataForModify, setAssistanceDataForModify] = useState<AssistanceInputsForm | undefined>();
 
   const { getAssistancesList } = useData();
   const showToast = useCustomToast();
 
-  const handleAssistance = async ({
-    assistanceDatas,
-    resetForm,
-  }: HandleSubmitParams) => {
-    const {
-      targa,
-      data_intervento,
-      esito_intervento,
-      numero_dossier,
-      importo_intervento,
-      nome_compagnia,
-    } = assistanceDatas;
+  const handleAssistance = async ({ assistanceDatas, resetForm }: HandleSubmitParams) => {
+    const { targa, data_intervento, esito_intervento, numero_dossier, importo_intervento, nome_compagnia } = assistanceDatas;
 
     let amountInNumber;
 
-    // Converto l'importo da stringa numvero per salvaro in firebase
+    // Converto l'importo da string a numero per salvaro in firebase
     const amountInString = importo_intervento.toString();
 
     // Gestico il caso in cui l'utente inserisco l'importo con la virgola
@@ -109,14 +85,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
     resetForm();
   };
 
-  const addNewAssistance = async ({
-    targa,
-    data_intervento,
-    esito_intervento,
-    numero_dossier,
-    importo_intervento,
-    nome_compagnia,
-  }: AssistanceInputsForm) => {
+  const addNewAssistance = async ({ targa, data_intervento, esito_intervento, numero_dossier, importo_intervento, nome_compagnia }: AssistanceInputsForm) => {
     try {
       await addDoc(collection(db, "lista_interventi"), {
         targa,
@@ -219,8 +188,6 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
     }
   };
 
-  // CRUD per aziende
-
   return (
     <ManageAssistancesCompaniesContext.Provider
       value={{
@@ -240,9 +207,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
 export const useManageAssistancesCompaniesContext = () => {
   const context = useContext(ManageAssistancesCompaniesContext);
   if (!context) {
-    throw new Error(
-      "useManageAssistanceCompaniesContext must be used within a ManageAssistanceCompaniesProvider"
-    );
+    throw new Error("useManageAssistanceCompaniesContext must be used within a ManageAssistanceCompaniesProvider");
   }
   return context;
 };
