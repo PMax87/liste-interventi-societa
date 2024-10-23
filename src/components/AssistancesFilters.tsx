@@ -1,25 +1,15 @@
 import { Formik, Form } from "formik";
 import CustomInput from "./CustomInput";
-import {
-  FormControl,
-  FormLabel,
-  Select,
-  FormErrorMessage,
-} from "@chakra-ui/react";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionPanel,
-  AccordionButton,
-  Box,
-  AccordionIcon,
-} from "@chakra-ui/react";
+import { FormControl, FormLabel, Select, FormErrorMessage } from "@chakra-ui/react";
+import { Accordion, AccordionItem, AccordionPanel, AccordionButton, Box, AccordionIcon } from "@chakra-ui/react";
 import CustomButton from "./CustomButton";
 import { useFilter } from "../context/FilterContext";
 import { useData } from "../context/DataContext";
 import filtersFormValidationSchema from "../validationSchema/filtersFormValidationSchema";
 import { TotalsBox } from ".";
 import { useEffect } from "react";
+import { format } from "date-fns";
+import { it } from "date-fns/locale";
 
 export interface AssistanceFiltersValues {
   start_date: string;
@@ -42,6 +32,7 @@ const AssistancesFilters = () => {
 
   const { filterData, resetAllFilters } = useFilter();
   const { companiesList, getAssistancesList } = useData();
+  const currentMoth = format(new Date(), "LLLL", { locale: it });
 
   useEffect(() => {
     getAssistancesList();
@@ -53,53 +44,27 @@ const AssistancesFilters = () => {
         <AccordionItem>
           <h2>
             <AccordionButton>
-              <Box as="span" flex="1" textAlign="left" fontWeight="bold">
-                Filtra gli interventi
+              <Box as="span" textAlign="left" flex={1} fontWeight="bold">
+                <div className="flex">
+                  <p className="mr-2">Filtra gli interventi</p>
+                  <p className="text-red-500">{`Gli interventi sono già filtrati per il mese di ${currentMoth.toUpperCase()}`}</p>
+                </div>
               </Box>
               <AccordionIcon />
             </AccordionButton>
           </h2>
           <AccordionPanel>
-            <Formik
-              initialValues={filterFormInitialValues}
-              onSubmit={(values) => filterData(values)}
-              validationSchema={filtersFormValidationSchema}
-            >
+            <Formik initialValues={filterFormInitialValues} onSubmit={(values) => filterData(values)} validationSchema={filtersFormValidationSchema}>
               {(formikProps) => (
                 <Form>
                   <div className="grid grid-cols-3 gap-5 mt-2">
-                    <CustomInput
-                      type="date"
-                      name="start_date"
-                      placeholder="Data di inizio"
-                      formLabel="Data di inizio"
-                    />
-                    <CustomInput
-                      type="date"
-                      name="end_date"
-                      placeholder="Data di fine"
-                      formLabel="Data di fine"
-                    />
-                    <CustomInput
-                      type="text"
-                      name="targa"
-                      placeholder="Cerca per targa"
-                      formLabel="Cerca per targa"
-                    />
+                    <CustomInput type="date" name="start_date" placeholder="Data di inizio" formLabel="Data di inizio" />
+                    <CustomInput type="date" name="end_date" placeholder="Data di fine" formLabel="Data di fine" />
+                    <CustomInput type="text" name="targa" placeholder="Cerca per targa" formLabel="Cerca per targa" />
                   </div>
                   <div className="grid grid-cols-3 gap-5 mt-3">
-                    <CustomInput
-                      type="text"
-                      name="numero_dossier"
-                      placeholder="Cerca per Dossier"
-                      formLabel="Cerca per dossier"
-                    />
-                    <FormControl
-                      isInvalid={Boolean(
-                        formikProps.errors.nome_compagnia &&
-                          formikProps.touched.nome_compagnia
-                      )}
-                    >
+                    <CustomInput type="text" name="numero_dossier" placeholder="Cerca per Dossier" formLabel="Cerca per dossier" />
+                    <FormControl isInvalid={Boolean(formikProps.errors.nome_compagnia && formikProps.touched.nome_compagnia)}>
                       <FormLabel htmlFor="lista_Societa" fontWeight="bold">
                         Lista società
                       </FormLabel>
@@ -112,29 +77,19 @@ const AssistancesFilters = () => {
                         {companiesList &&
                           companiesList.map((companyName) => {
                             return (
-                              <option
-                                value={companyName.nome_compagnia}
-                                className="capitalize"
-                                key={companyName.id}
-                              >
+                              <option value={companyName.nome_compagnia} className="capitalize" key={companyName.id}>
                                 {companyName.nome_compagnia}
                               </option>
                             );
                           })}
                       </Select>
-                      <FormErrorMessage>
-                        {formikProps.errors.nome_compagnia}
-                      </FormErrorMessage>
+                      <FormErrorMessage>{formikProps.errors.nome_compagnia}</FormErrorMessage>
                     </FormControl>
                     <FormControl>
                       <FormLabel htmlFor="accettato" fontWeight="bold">
                         Accettato
                       </FormLabel>
-                      <Select
-                        name="esito_intervento"
-                        onChange={formikProps.handleChange}
-                        value={formikProps.values.esito_intervento}
-                      >
+                      <Select name="esito_intervento" onChange={formikProps.handleChange} value={formikProps.values.esito_intervento}>
                         <option value="">Tutti</option>
                         <option value="si">Si</option>
                         <option value="no">No</option>
@@ -142,12 +97,7 @@ const AssistancesFilters = () => {
                     </FormControl>
                   </div>
                   <div className="flex justify-center gap-1 mt-5">
-                    <CustomButton
-                      type="submit"
-                      buttonColor="blue"
-                      buttonText="Applica filtri"
-                      isDisabled={!formikProps.isValid}
-                    />
+                    <CustomButton type="submit" buttonColor="blue" buttonText="Applica filtri" isDisabled={!formikProps.isValid} />
                     <CustomButton
                       onClick={() => resetAllFilters(formikProps.resetForm)}
                       type="button"

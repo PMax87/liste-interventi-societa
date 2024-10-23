@@ -13,11 +13,11 @@ createRoot(document.getElementById("root")!).render(
     <ChakraProvider>
       <AuthProvider>
         <DataProvider>
-          <ManageAssistancesCompaniesProvider>
-            <FilterProvider>
+          <FilterProvider>
+            <ManageAssistancesCompaniesProvider>
               <App />
-            </FilterProvider>
-          </ManageAssistancesCompaniesProvider>
+            </ManageAssistancesCompaniesProvider>
+          </FilterProvider>
         </DataProvider>
       </AuthProvider>
     </ChakraProvider>
