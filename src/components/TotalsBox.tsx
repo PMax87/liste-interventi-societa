@@ -6,9 +6,9 @@ const TotalsBox = () => {
   const { assistancesList } = useData();
 
   // conto manualmente gli interventi in quanto FIREBASE non può contare gli elementi precedentemente filtrati
-  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<number | null>(null);
-  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssistances] = useState<number | null>(null);
-  const [totalAmount, setTotalAmount] = useState<number | null>(null);
+  const [totalAcceptedAssistances, setTotalAcceptedAssistances] = useState<number>(0);
+  const [totalNonAcceptedAssistances, setTotalNonAcceptedAssistances] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   useEffect(() => {
     if (assistancesList) {
@@ -21,39 +21,40 @@ const TotalsBox = () => {
     }
   }, [assistancesList]);
 
-  let totalAssistances = null;
-  let totalAmountWithoutVat = null;
-  let calcVat = null;
+  let totalAssistances = 0;
+  let totalAmountWithoutVat = 0;
+  let calcVat = 0;
 
-  if (totalAcceptedAssistances && totalNonAcceptedAssistances !== null) {
+  if (totalAcceptedAssistances && totalNonAcceptedAssistances) {
     totalAssistances = totalAcceptedAssistances + totalNonAcceptedAssistances;
   }
 
-  calcVat = (100 * totalAmount) / 122;
-  totalAmountWithoutVat = totalAmount - calcVat;
-  console.log(totalAmountWithoutVat);
+  if (totalAmount !== null) {
+    calcVat = (100 * totalAmount) / 122;
+    totalAmountWithoutVat = totalAmount - calcVat;
+  }
 
   return (
     <div className="grid grid-cols-5 mt-6 justify-items-center">
       <div className="flex flex-col gap-1 items-center">
         <p className="font-bold">Totale interventi</p>
-        <p>{totalAssistances === null ? "" : totalAssistances}</p>
+        <p>{totalAcceptedAssistances + totalNonAcceptedAssistances}</p>
       </div>
       <div className="flex flex-col gap-1 items-center">
         <p className="font-bold">Totale interventi accettati</p>
-        <p>{totalAcceptedAssistances === null ? "" : totalAcceptedAssistances}</p>
+        <p>{totalAcceptedAssistances}</p>
       </div>
       <div className="flex flex-col gap-1 items-center">
         <p className="font-bold">Totale interventi non accettati</p>
-        <p>{totalNonAcceptedAssistances === null ? "" : totalNonAcceptedAssistances}</p>
+        <p>{totalNonAcceptedAssistances}</p>
       </div>
       <div className="flex flex-col gap-1 items-center">
         <p className="font-bold">Importo imponibile</p>
-        <p>{totalAmountWithoutVat === null ? "" : formatPriceEurCurrency(totalAmount - totalAmountWithoutVat)}</p>
+        <p>{formatPriceEurCurrency(totalAmount - totalAmountWithoutVat)}</p>
       </div>
       <div className="flex flex-col gap-1 items-center">
         <p className="font-bold">Importo Ivato </p>
-        <p>{totalAmount === null ? "" : formatPriceEurCurrency(totalAmount)}</p>
+        <p>{formatPriceEurCurrency(totalAmount)}</p>
       </div>
     </div>
   );

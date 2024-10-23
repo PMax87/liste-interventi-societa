@@ -151,6 +151,7 @@ export const ManageAssistancesCompaniesProvider: React.FC<{
 
   const getAssistanceById = async (assistanceId: string) => {
     try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setIdForEditing(assistanceId);
       setIsEditing(true);
       const assistanceRef = doc(db, "lista_interventi", assistanceId);
