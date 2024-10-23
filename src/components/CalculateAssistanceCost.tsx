@@ -67,8 +67,8 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpe
     setTotalAmount(importoTotale);
   };
 
-  const manageSubmit = (campo, valore) => {
-    setFieldValue(campo, valore);
+  const manageSubmit = (filedToUpdate: string, totalAmount: number) => {
+    setFieldValue(filedToUpdate, totalAmount);
     onClose();
   };
 
