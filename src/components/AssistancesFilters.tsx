@@ -1,6 +1,6 @@
 import { Formik, Form } from "formik";
 import CustomInput from "./CustomInput";
-import { FormControl, FormLabel, Select, FormErrorMessage } from "@chakra-ui/react";
+import { FormControl, FormLabel, Select } from "@chakra-ui/react";
 import { Accordion, AccordionItem, AccordionPanel, AccordionButton, Box, AccordionIcon } from "@chakra-ui/react";
 import CustomButton from "./CustomButton";
 import { useFilter } from "../context/FilterContext";
@@ -10,6 +10,7 @@ import { TotalsBox } from ".";
 import { useEffect } from "react";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
+import { CustomSelect } from ".";
 
 export interface AssistanceFiltersValues {
   start_date: string;
@@ -65,27 +66,14 @@ const AssistancesFilters = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-5 mt-3">
                     <CustomInput type="text" name="numero_dossier" placeholder="Cerca per Dossier" formLabel="Cerca per dossier" />
-                    <FormControl isInvalid={Boolean(formikProps.errors.nome_compagnia && formikProps.touched.nome_compagnia)}>
-                      <FormLabel htmlFor="lista_Societa" fontWeight="bold">
-                        Lista società
-                      </FormLabel>
-                      <Select
-                        name="nome_compagnia"
-                        placeholder="Seleziona una società"
-                        onChange={formikProps.handleChange}
-                        value={formikProps.values.nome_compagnia}
-                      >
-                        {companiesList &&
-                          companiesList.map((companyName) => {
-                            return (
-                              <option value={companyName.nome_compagnia} className="capitalize" key={companyName.id}>
-                                {companyName.nome_compagnia}
-                              </option>
-                            );
-                          })}
-                      </Select>
-                      <FormErrorMessage>{formikProps.errors.nome_compagnia}</FormErrorMessage>
-                    </FormControl>
+                    <CustomSelect
+                      options={companiesList}
+                      getOptionValue={(option) => option.id}
+                      getOptionLabel={(option) => option.nome_compagnia}
+                      placeholder="Seleziona una società"
+                      formLabel="Seleziona una società"
+                      name="nome_compagnia"
+                    />
                     <FormControl>
                       <FormLabel htmlFor="accettato" fontWeight="bold">
                         Accettato

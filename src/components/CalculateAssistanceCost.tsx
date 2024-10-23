@@ -1,8 +1,9 @@
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Select } from "@chakra-ui/react";
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import CustomInput from "./CustomInput";
 import { useData } from "../context/DataContext";
 import { CustomSelect } from ".";
+import { useState } from "react";
 
 interface CalculateAssistanceCostProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ interface calculateCostFormInitialValues {
 
 const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpen, onClose, totalAmount, setTotalAmount, setFieldValue }) => {
   const { companiesList } = useData();
+  const [costoOltre25KmMapfre, setCostoOltre25KmMapfre] = useState(0);
 
   const pesi_veicolo_mapfre = [
     { id: 1, peso_veicolo: "Da 0 a 2.5 Ton" },
@@ -52,6 +54,14 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpe
       } else {
         kmOltre25 = km_totali - 25;
         importoTotale = parseFloat((kmOltre25 * 0.82).toFixed(2)) + 45;
+      }
+    }
+    if (nome_compagnia === "hlpy") {
+      if (km_totali <= 25) {
+        importoTotale = 53;
+      } else {
+        kmOltre25 = km_totali - 25;
+        importoTotale = kmOltre25 * 1 + 53;
       }
     }
     setTotalAmount(importoTotale);
