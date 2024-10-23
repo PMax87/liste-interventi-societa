@@ -1,7 +1,12 @@
 import { Form, FormikProps } from "formik";
 import { AssistanceInputsForm } from "../models/AssistanceInputsForm";
 import CustomInput from "./CustomInput";
-import { FormControl, FormLabel, Checkbox, useDisclosure } from "@chakra-ui/react";
+import {
+  FormControl,
+  FormLabel,
+  Checkbox,
+  useDisclosure,
+} from "@chakra-ui/react";
 import CustomButton from "./CustomButton";
 import { useData } from "../context/DataContext";
 import { useManageAssistancesCompaniesContext } from "../context/ManageAssistancesCompaniesContext";
@@ -13,24 +18,49 @@ interface AssistanceFormLogicProps {
   formikProps: FormikProps<AssistanceInputsForm>;
 }
 
-const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({ formikProps }) => {
+const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({
+  formikProps,
+}) => {
   const { companiesList } = useData();
   const { isEditing } = useManageAssistancesCompaniesContext();
   const { onOpen, isOpen, onClose } = useDisclosure();
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
   return (
     <Form>
       <div className="grid grid-cols-3 gap-5 content-center">
-        <CustomInput type="date" placeholder="Data Intervento" formLabel="Data Intervento" name="data_intervento" />
-        <CustomInput placeholder="inserisci la targa" formLabel="Targa Veicolo" type="text" name="targa" />
+        <CustomInput
+          type="date"
+          placeholder="Data Intervento"
+          formLabel="Data Intervento"
+          name="data_intervento"
+        />
+        <CustomInput
+          placeholder="inserisci la targa"
+          formLabel="Targa Veicolo"
+          type="text"
+          name="targa"
+        />
 
-        <CustomInput placeholder="Inserisci numero dossier" formLabel="Numero Dossier" type="text" name="numero_dossier" />
+        <CustomInput
+          placeholder="Inserisci numero dossier"
+          formLabel="Numero Dossier"
+          type="text"
+          name="numero_dossier"
+        />
       </div>
       <div className="grid grid-cols-3 gap-5 content-center mt-3">
         <div>
-          <CustomInput placeholder="Inserisci importo intervento" formLabel="Importo Intervento" type="text" name="importo_intervento" />
-          <p onClick={onOpen} className="text-red-500 font-semibold text-sm mt-1 inline cursor-pointer">
+          <CustomInput
+            placeholder="Inserisci importo intervento"
+            formLabel="Importo Intervento"
+            type="text"
+            name="importo_intervento"
+          />
+          <p
+            onClick={onOpen}
+            className="text-red-500 font-semibold text-sm mt-1 inline cursor-pointer"
+          >
             Calcola importo
           </p>
           <CalculateAssistanceCost
@@ -53,7 +83,13 @@ const AssistanceFormLogic: React.FC<AssistanceFormLogicProps> = ({ formikProps }
           <FormLabel htmlFor="accettato" fontWeight="bold">
             Accettato
           </FormLabel>
-          <Checkbox name="esito_intervento" onChange={formikProps.handleChange} isChecked={formikProps.values.esito_intervento === false ? false : true} />
+          <Checkbox
+            name="esito_intervento"
+            onChange={formikProps.handleChange}
+            isChecked={
+              formikProps.values.esito_intervento === false ? false : true
+            }
+          />
         </FormControl>
       </div>
       <div className="mt-5 text-center">
