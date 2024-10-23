@@ -37,6 +37,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     CompaniesListModel[] | undefined
   >();
 
+  // Filtri gli intervento in base al mese corrente
   const today = new Date();
   const firstDateOfMonth = format(today, "yyyy-MM-01");
   const lastDateOfMonth = format(lastDayOfMonth(today), "yyyy-MM-dd");
