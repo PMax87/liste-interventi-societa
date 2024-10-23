@@ -1,4 +1,4 @@
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button } from "@chakra-ui/react";
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import CustomInput from "./CustomInput";
 import { useData } from "../context/DataContext";
@@ -69,6 +69,7 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpe
 
   const manageSubmit = (filedToUpdate: string, totalAmount: number) => {
     setFieldValue(filedToUpdate, totalAmount);
+    setTotalAmount(0);
     onClose();
   };
 
@@ -118,7 +119,6 @@ const CalculateAssistanceCost: React.FC<CalculateAssistanceCostProps> = ({ isOpe
             )}
           </Formik>
         </ModalBody>
-        <ModalFooter></ModalFooter>
       </ModalContent>
     </Modal>
   );
