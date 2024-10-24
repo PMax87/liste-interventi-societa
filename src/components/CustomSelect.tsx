@@ -13,12 +13,10 @@ interface CustomSelectProps<T> {
 const CustomSelect = <T,>({ placeholder, name, formLabel, options, getOptionLabel, getOptionValue, ...props }: CustomSelectProps<T>) => {
   const [field, meta] = useField(name);
 
-  console.log(field.value);
-
   return (
     <FormControl isInvalid={Boolean(meta.error && meta.touched)}>
       <FormLabel fontWeight={"bold"}>{formLabel}</FormLabel>
-      <Select placeholder={placeholder} {...field}>
+      <Select placeholder={placeholder} {...field} name={name}>
         {options &&
           options.map((option) => {
             return (

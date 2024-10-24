@@ -4,24 +4,13 @@ interface CustomButtonProps {
   buttonText: string;
   buttonColor: string;
   onClick?: () => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   type: "button" | "submit" | "reset" | undefined;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({
-  buttonText,
-  buttonColor,
-  type,
-  isDisabled,
-  onClick,
-}) => {
+const CustomButton: React.FC<CustomButtonProps> = ({ buttonText, buttonColor, type, isDisabled, onClick }) => {
   return (
-    <Button
-      type={type}
-      colorScheme={buttonColor}
-      isDisabled={isDisabled}
-      onClick={onClick}
-    >
+    <Button type={type} colorScheme={buttonColor} isDisabled={isDisabled} onClick={onClick}>
       {buttonText}
     </Button>
   );
